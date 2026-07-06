@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
+	<PropertyGroup>
+		<RootNamespace>SystemLibrary.Common.Framework</RootNamespace>
+		<RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+		<RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<AnalysisLevel>latest</AnalysisLevel>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Configurations>Release;Debug</Configurations>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'DEBUG'">
+		<DefineConstants>DEBUG</DefineConstants>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" ExcludeAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Azure.Identity" Version="1.21.0" />
+		<PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.11.0" />
+		<PackageReference Include="prometheus-net" Version="8.2.1" ExcludeAssets="analyzers;" />
+	</ItemGroup>
+</Project>

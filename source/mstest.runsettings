@@ -1,0 +1,16 @@
+﻿<RunSettings>
+	<MSTest>
+		<Parallelize>
+		  <Workers>0</Workers>
+		  <Scope>MethodLevel</Scope>
+		</Parallelize>
+    </MSTest>
+	<RunConfiguration>
+		<EnvironmentVariables>
+			<ASPNETCORE_ENVIRONMENT>DeVeloPment</ASPNETCORE_ENVIRONMENT>
+		</EnvironmentVariables>
+		<DisableParallelization>true</DisableParallelization>
+		<ResultsDirectory>.\TestResults</ResultsDirectory>
+		<GenerateInconclusiveResults>false</GenerateInconclusiveResults>
+	</RunConfiguration>
+</RunSettings>

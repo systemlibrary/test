@@ -1,0 +1,37 @@
+# User files
+*.suo
+*.user
+
+# Key files
+*.dll
+*.so
+*.dylib
+
+# Exception for license binaries
+!source/systemlibrary.common.framework.license/*.dll
+!source/systemlibrary.common.framework.license/*.so
+!source/systemlibrary.common.framework.license/*.dylib
+
+# Visual studio folders
+.vs/
+
+# MsBuild folders
+[Oo]bj/
+[Bb]in/
+[Tt]est[Rr]esult/
+[Tt]est[Rr]esults/
+
+# Benchmarks
+**/*.Artifacts/
+
+# Nuget files and folders
+*.nupkg
+
+# docfx
+*_site/
+__docfxsite/
+docfxtemplate/
+docsapi/
+docfx.json
+docfxfilter.yml
+__docfxsite.log

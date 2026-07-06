@@ -1,0 +1,37 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  ASPNETCORE_ENVIRONMENT: CI
+
+jobs:
+  release:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, '- ')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Restore and Build all solutions except Framework.sln
+        run: |
+          find . -name "*.sln" ! -name "*Framework.sln" | while read sln; do
+            echo "Building $sln"
+            dotnet restore "$sln"
+            dotnet build "$sln" --configuration Release --no-restore
+          done
+
+      - name: Run all tests
+        run: |
+          find . -name "*SystemLibrary.Common.Framework.Net.Tests.csproj" | while read proj; do
+            echo "Testing $proj"
+            dotnet test "$proj" --configuration Release --no-restore
+          done
