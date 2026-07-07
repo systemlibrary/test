@@ -12,7 +12,7 @@ internal static class ConfigFinder
 
         if (AppConfigInstance.Configurations.ContainsKey(configurationName))
             return AppConfigInstance.Configurations[configurationName];
-
+        
         return AppConfigInstance.Configurations["appsettings"];
     }
 }

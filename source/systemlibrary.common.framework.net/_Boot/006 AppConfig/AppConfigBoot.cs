@@ -10,8 +10,6 @@ internal static partial class AppConfigBoot
     {
         var configurationFiles = FindConfigurationFiles();
 
-        AppConfigInstance.AppSettings = AppConfigLoader.LoadAppSettings(configurationFiles);
-
         AppConfigInstance.Configurations = AppConfigLoader.Load(configurationFiles);
     }
 
@@ -42,6 +40,12 @@ internal static partial class AppConfigBoot
             }
         }
 
+        if (all.IsNot())
+        {
+            //FrameworkLog.Debug("appsettings.json not found at root, default appsettings IConfiguration is created from CLI and some environment variables");
+            all = new[] { "appsettings.json" };
+        }
+
         return all;
     }
 
@@ -55,7 +59,7 @@ internal static partial class AppConfigBoot
             file.Contains("appmanifest.", StringComparison.Ordinal) ||
             file.Contains(".deps.json", StringComparison.Ordinal) ||
             file.Contains("microsoft.visualstudio", StringComparison.Ordinal) ||
-            file.Contains("launchSettings.json", StringComparison.Ordinal) ||
+            file.Contains("launchsettings.json", StringComparison.Ordinal) ||
             file.Contains("lint.json", StringComparison.Ordinal) ||
             file.Contains("tsconfig.json", StringComparison.Ordinal) ||
             file.Contains("bower.json", StringComparison.Ordinal) ||

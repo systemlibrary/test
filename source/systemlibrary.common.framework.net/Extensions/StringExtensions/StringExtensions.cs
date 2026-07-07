@@ -122,4 +122,38 @@ public static partial class StringExtensions
 
         return text.Replace(oldValues[0], newValue);
     }
+
+    /// <summary>
+    /// Returns the string truncated to <c>maxLength</c> characters. Optionally appends ellipsis.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// "hello world".MaxLength(5);              // "hello"
+    /// "hello world".MaxLength(8, true);        // "hello..."
+    /// </code>
+    /// </example>
+    public static string MaxLength(this string text, int maxLength, bool useEllipsis = false)
+    {
+        if (text == null) return "";
+
+        if (text.Length <= maxLength) return text;
+
+        if (useEllipsis && maxLength > 3)
+        {
+            if (maxLength > 1024)
+            {
+                var sb = new StringBuilder(maxLength);
+
+                sb.Append(text.AsSpan(0, maxLength - 3))
+                  .Append("...");
+
+                return sb.ToString();
+            }
+            return new string(text.AsSpan(0, maxLength - 3)) + "...";
+        }
+
+        if (maxLength <= 0) return "";
+
+        return new string(text.AsSpan(0, maxLength));
+    }
 }

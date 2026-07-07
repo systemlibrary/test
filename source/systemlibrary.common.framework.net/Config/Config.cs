@@ -17,6 +17,7 @@ public abstract partial class Config<T> where T : class
             lock (Lock)
             {
                 if (_Current != null) return _Current;
+
                 var configuration = ConfigFinder.FindByType(type);
 
                 _Current = configuration.Get<T>(opt =>
@@ -42,7 +43,7 @@ public abstract partial class Config<T> where T : class
 
                 try
                 {
-                    SetPublicEnumFields(configuration, _Current, type);
+                    SetPublicEnumProperties(configuration, _Current, type);
                 }
                 catch (Exception ex)
                 {

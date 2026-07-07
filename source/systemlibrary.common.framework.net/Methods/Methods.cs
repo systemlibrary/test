@@ -85,7 +85,7 @@ internal static class Methods
 
         var options = new ParallelOptions
         {
-            MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 4),
+            MaxDegreeOfParallelism = Math.Max(2, Environment.ProcessorCount / 4),
             CancellationToken = token
         };
 
@@ -150,7 +150,7 @@ internal static class Methods
 
         var options = new ParallelOptions
         {
-            MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 4),
+            MaxDegreeOfParallelism = Math.Max(2, Environment.ProcessorCount / 4),
             CancellationToken = token
         };
 

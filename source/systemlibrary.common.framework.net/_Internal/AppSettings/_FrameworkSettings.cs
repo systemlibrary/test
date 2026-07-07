@@ -3,7 +3,6 @@
 internal class FrameworkSettings
 {
     public _AppSettings App { get; set; }
-    public ConfigSettings Config { get; set; }
     public CryptographySettings Cryptography { get; set; }
     public JsonSettings Json { get; set; }
     public LogSettings Log { get; set; }
@@ -14,7 +13,6 @@ internal class FrameworkSettings
     public FrameworkSettings()
     {
         App = new _AppSettings();
-        Config = new ConfigSettings();
         Cryptography = new CryptographySettings();
         Json = new JsonSettings();
         Log = new LogSettings();

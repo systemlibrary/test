@@ -107,4 +107,16 @@ partial class StringExtensions
         return result;
     }
 
+    /// <summary>
+    /// Returns a SHA256 hash string of the text.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// var hash = "Hello world".ToSha256Hash();
+    /// </code>
+    /// </example>
+    public static string ToSha256Hash(this string text)
+    {
+        return Sha256.Compute(text.GetBytes());
+    }
 }

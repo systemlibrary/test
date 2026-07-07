@@ -6,25 +6,30 @@ namespace SystemLibrary.Common.Framework;
 
 partial class Config<T>
 {
-    static void SetPublicEnumFields(IConfiguration configuration, object instance, Type type)
+    // NOTE: Why is this only on Fields inside a Config class which uses props only
+    static void SetPublicEnumProperties(IConfiguration configuration, object instance, Type type)
     {
         if (instance == null) return;
 
         if (configuration == null) return;
 
-        var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetField | BindingFlags.SetField);
+        var props = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetField | BindingFlags.SetField);
 
-        if (fields == null) return;
+        if (props == null) return;
 
-        foreach (var field in fields)
+        foreach (var prop in props)
         {
-            var fieldType = field.FieldType;
-            if (fieldType.IsEnum)
+            if (!prop.CanRead || !prop.CanWrite)
+                continue;
+
+            var propertyType = prop.PropertyType;
+
+            if (propertyType.IsEnum)
             {
-                var value = configuration[field.Name];
+                var value = configuration[prop.Name];
                 if (value != null)
                 {
-                    field.SetValue(instance, value.ToEnum(fieldType));
+                    prop.SetValue(instance, value.ToEnum(propertyType));
                 }
             }
         }

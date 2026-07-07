@@ -65,4 +65,70 @@ partial class StringExtensions
 
         return true;
     }
+
+    /// <summary>
+    /// Checks if input is a file path, either relative or absolute, either web or operative system path
+    /// </summary>
+    /// <remarks>
+    /// Does not throw
+    /// <para>Returns true if input is longer than 3 and contains a 'file extension' of 1 to 6 characters, else false</para>
+    /// <para>Returns true if input contains /public/, /static/, /images/ or 'assets/' as we assume a file is asked for</para>
+    /// <para>Supports input as relative, absolute, and with url query params</para>
+    /// <para>Returns false if input exceeds 4096 characters</para>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var hello = "world";
+    /// var isFile = hello.IsFile(); // false
+    /// 
+    /// var file = "/image/redcar1.jpg?qualit=80";
+    /// var isFile = file.IsFile(); // true
+    /// 
+    /// var file2 = "/assets/bluecar";
+    /// var isFile = file2.IsFile(); // true, assumes any "assets/" request is a file
+    /// </code>
+    /// </example>
+    /// <returns>True or false</returns>
+    public static bool IsFile(this string path)
+    {
+        if (path == null || path.Length <= 3 || path.Length > 4096) return false;
+
+        if (path.EndsWith("/")) return false;
+
+        if (path.IndexOfAny(Path.GetInvalidPathChars()) != -1) return false;
+
+        if (path.Contains("<")) return false;
+
+        bool HasAssetPath() =>
+            path.Contains("/public/", StringComparison.OrdinalIgnoreCase) ||
+            path.Contains("/images/", StringComparison.OrdinalIgnoreCase) ||
+            path.Contains("/static/", StringComparison.OrdinalIgnoreCase) ||
+            path.Contains("assets/", StringComparison.OrdinalIgnoreCase);
+
+        var extensionIndex = path.LastIndexOf('.');
+
+        if (extensionIndex == -1) return HasAssetPath();
+
+        var queryIndex = path.IndexOf('?');
+
+        if (queryIndex == -1)
+        {
+            if (extensionIndex == path.Length - 1) return HasAssetPath();
+
+            if (path.LastIndexOf('/') > extensionIndex) return HasAssetPath();
+
+            return extensionIndex >= path.Length - 7 || HasAssetPath(); // .config
+        }
+
+        if (extensionIndex > queryIndex)
+        {
+            var temp = path.Substring(0, queryIndex);
+
+            return temp.LastIndexOf('.') >= temp.Length - 7 || HasAssetPath(); // .config
+        }
+
+        if (path[queryIndex - 1] == '/') return false;
+
+        return queryIndex - 7 <= extensionIndex || HasAssetPath();
+    }
 }
