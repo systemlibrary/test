@@ -17,16 +17,17 @@ static class EnvironmentBoot
 
         if (EnvironmentInstance.EnvironmentName.IsNot())
         {
-          //  FrameworkLog.Debug($"[Bootstrap.Configurations] Environment is unset, using default environment: {EnvironmentInstance.EnvironmentType}");
+            //  FrameworkLog.Debug($"[Bootstrap.Configurations] Environment is unset, using default environment: {EnvironmentInstance.EnvironmentType}");
         }
     }
 
     static string[] GetCommandLineArgs()
     {
         return Environment.GetCommandLineArgs()
-            ?.Where(x => x != null)
-            ?.Select(x => x.Trim())
-            .ToArray();
+          .Where(x => x.Is())
+          .Select(x => x.Trim())
+          .Where(x => x.Is())
+          .ToArray();
     }
 
     static string EnvironmentName()
@@ -71,13 +72,13 @@ static class EnvironmentBoot
             }
             catch (Exception ex)
             {
-              //  FrameworkLog.Warning("[AppInstance] DOTNET_ENVIRONMENT could not be read " + ex.Message);
+                //  FrameworkLog.Warning("[AppInstance] DOTNET_ENVIRONMENT could not be read " + ex.Message);
             }
         }
 
         return name ?? "";
     }
-    
+
     static bool IsDev(EnvironmentType env)
     {
         return env == Framework.EnvironmentType.Dev || env == Framework.EnvironmentType.Develop || env == EnvironmentType.Development || env == EnvironmentType.Local;

@@ -21,7 +21,7 @@ internal static class AppConfigBuilder
 
     internal static ConfigurationBuilder CreateDefaultBuilder()
     {
-        var args = Environment.GetCommandLineArgs();
+        var args = EnvironmentInstance.Args;
 
         var builder = new ConfigurationBuilder();
 

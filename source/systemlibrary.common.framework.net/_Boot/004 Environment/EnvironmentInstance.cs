@@ -18,10 +18,51 @@ internal static class EnvironmentInstance
         Boot.Strap();
     }
 
+    static EnvironmentVariableTarget[] EnvironmentVariableTargetsOrder = new[]
+    {
+        EnvironmentVariableTarget.Process,
+        EnvironmentVariableTarget.User,
+        EnvironmentVariableTarget.Machine
+    };
+
     internal static string GetEnvironmentVariable(string variable)
     {
-        return Environment.GetEnvironmentVariable(variable, EnvironmentVariableTarget.Process)
-            ?? Environment.GetEnvironmentVariable(variable, EnvironmentVariableTarget.User)
-            ?? Environment.GetEnvironmentVariable(variable, EnvironmentVariableTarget.Machine);
+        if (variable.IsNot()) return null;
+
+        if (char.IsLower(variable[0]))
+            variable = variable.ToUpperInvariant();
+
+        if (TryGetEnvironmentVariable(variable, out string value))
+            return value;
+        
+        variable = variable.ToLowerInvariant();
+
+        if (TryGetEnvironmentVariable(variable, out value))
+            return value;
+
+        return null;
+    }
+
+    static bool TryGetEnvironmentVariable(string v, out string result)
+    {
+        result = null;
+
+        foreach (var target in EnvironmentVariableTargetsOrder)
+        {
+            try
+            {
+                result = Environment.GetEnvironmentVariable(v, target);
+                if (result.Is())
+                    return true;
+            }
+            catch
+            {
+                // swallow:
+                // access denied
+                // unsupported targets
+
+            }
+        }
+        return false;
     }
 }
