@@ -50,6 +50,16 @@ internal static class Methods
         return Parallel(30000, functions);
     }
 
+    internal static List<TResult> Parallel<TArg, TResult>(IEnumerable<TArg> arguments, Func<TArg, TResult> action)
+    {
+        if (arguments == null || !arguments.Any())
+            return new List<TResult>();
+
+        var actions = arguments.Select(x => (Func<TResult>)(() => action(x))).ToArray();
+
+        return Parallel(30000, actions);
+    }
+
     /// <summary>
     /// Runs the given functions in parallel and returns all methods started within the timeout.
     /// <para>Blocks until all functions finish or the timeout cancels execution.</para>

@@ -33,8 +33,8 @@ internal static class AppConfigKeyVault
             {
                 options.Retry.Delay = TimeSpan.FromMilliseconds(1000);
                 options.Retry.MaxRetries = 2;
-                options.Retry.MaxDelay = TimeSpan.FromSeconds(15);
-                options.Retry.NetworkTimeout = TimeSpan.FromSeconds(5);
+                options.Retry.MaxDelay = TimeSpan.FromSeconds(10);
+                options.Retry.NetworkTimeout = TimeSpan.FromSeconds(10);
             }
 
             Client = new SecretClient(new Uri(KeyVaultUrl), new DefaultAzureCredential(), options);
@@ -58,6 +58,7 @@ internal static class AppConfigKeyVault
             builder.AddInMemoryCollection(fetched.Transformations);
     }
 
+
     internal static (IEnumerable<KeyValuePair<string, string>> Configs, IEnumerable<KeyValuePair<string, string>> Transformations) Fetch(string fileName)
     {
         var environmentName = EnvironmentInstance.EnvironmentName;
@@ -69,9 +70,8 @@ internal static class AppConfigKeyVault
         {
             // TODO: Use "Methods.Parallell" to grab at least two and two secrets somewhat efficiently
             // PS: Bit careful as LoadConfig is executing already in parallell per configuration found, so parallell here too means "nested parallellism"
-            var configFromVault = Client.GetSecret(fileName + ".json")?.Value?.Value;
-
-            var transformationsFromVault = Client.GetSecret(fileName + "." + environmentName + ".json")?.Value?.Value;
+            var configFromVault = Get(fileName + ".json");
+            var transformationsFromVault = Get(fileName + "." + environmentName + ".json");
 
             if (configFromVault != null)
             {
@@ -101,5 +101,24 @@ internal static class AppConfigKeyVault
         }
 
         return (configs, transformations);
+    }
+
+    internal static string Get(string variableName)
+    {
+        if (Client == null) return null;
+
+        try
+        {
+            // TODO: Create a cache on disc in ephemeral systems in case of container restarts 
+            // or app is unhealthy and starts again, DDOS, whatnot, and KeyVault is unresponsive
+            // simply encrypting the data before storing with a hard-coded framework key, and decrypting again is sufficient for such ephemerial storages
+            // can include the appname as key and its salt.
+            return Client.GetSecret(variableName)?.Value?.Value;
+        }
+        catch
+        {
+            // swallow: unaccessible, down, network blocked
+            return null;
+        }
     }
 }

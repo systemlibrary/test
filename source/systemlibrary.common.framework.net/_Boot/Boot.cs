@@ -46,7 +46,7 @@ internal partial class Boot
 
             AppInstanceBoot.Strap();
 
-            CryptographyInstanceBoot.Strap();
+            CryptographyBoot.Strap();
         }
         catch (Exception ex)
         {
