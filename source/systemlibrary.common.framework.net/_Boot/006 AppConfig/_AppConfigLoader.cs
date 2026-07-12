@@ -1,4 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Diagnostics;
+
+using Microsoft.Extensions.Configuration;
+
+using SystemLibrary.Common.Framework.Extensions;
 
 namespace SystemLibrary.Common.Framework.Boostrap;
 
@@ -8,7 +12,7 @@ static class AppConfigLoader
     {
         var configurationGroups = GetConfigurationGroups(configurationFiles);
 
-        if (configurationFiles.Length > configurationGroups.Length)
+        if (configurationFiles.Length > configurationGroups.Count)
         {
             //FrameworkLog.Debug($"[Bootstrap.Configurations] Environment is {EnvironmentInstance.EnvironmentType}, loading configurations and transformations");
         }
@@ -17,34 +21,39 @@ static class AppConfigLoader
             // FrameworkLog.Debug($"[Bootstrap.Configurations] Environment is {EnvironmentInstance.EnvironmentType}, loading configurations");
         }
 
+        if (!configurationGroups.Any(x => x.Name == "appsettings"))
+        {
+            var appsettingsGroup = new AppConfigGroup
+            {
+                Name = "appsettings",
+                Extension = "json"
+            };
+            configurationGroups.Add(appsettingsGroup);
+        }
+
         var actions = configurationGroups
-            .Where(x => x.Is())
+            .Where(x => x?.Name.Is() == true)
             .Select(ToLoadAction)
             .ToArray();
 
         var results = Methods.Parallel(45000, actions);
-
+        
         var configurations = results
             .Where(x => x.Config != default)
-            .ToDictionary(x => x.Name, x => x.Config, StringComparer.OrdinalIgnoreCase);
-
-        if(!configurations.ContainsKey("appsettings"))
-        {
-            //FrameworkDebug.Log("appsettings not found, nor a default one was created. Youve created json configurations, but main 'appsettings.json' is not created.");
-        }
+            .ToDictionary(x => x.group.Name, x => x.Config, StringComparer.OrdinalIgnoreCase);
 
         return configurations;
     }
 
-    static Func<(string Name, IConfigurationRoot Config)> ToLoadAction(string configurationFile)
+    static Func<(AppConfigGroup group, IConfigurationRoot Config)> ToLoadAction(AppConfigGroup configurationGroup)
     {
         return () => (
-            Name: configurationFile.ToLower(),
-            Config: LoadConfig(configurationFile)
+            group: configurationGroup,
+            Config: LoadConfig(configurationGroup)
         );
     }
 
-    internal static IConfigurationRoot LoadConfig(string configFileName)
+    internal static IConfigurationRoot LoadConfig(AppConfigGroup group)
     {
         try
         {
@@ -52,9 +61,9 @@ static class AppConfigLoader
 
             var isDev = EnvironmentInstance.IsDev;
 
-            var fileName = Path.GetFileName(configFileName);
+            var fileName = group.Name;
 
-            var extension = Path.GetExtension(configFileName);
+            var extension = group.Extension;
 
             if (isDev)
             {
@@ -62,7 +71,7 @@ static class AppConfigLoader
                     AppConfigBuilder.AppendXmlFile(builder, fileName, extension);
                 else
                 {
-                    AppConfigBuilder.AppendKeyVault(builder, configFileName);
+                    AppConfigBuilder.AppendKeyVault(builder, fileName, extension);
 
                     AppConfigBuilder.AppendJsonFile(builder, fileName, extension);
                 }
@@ -75,7 +84,7 @@ static class AppConfigLoader
                 {
                     AppConfigBuilder.AppendJsonFile(builder, fileName, extension);
 
-                    AppConfigBuilder.AppendKeyVault(builder, configFileName);
+                    AppConfigBuilder.AppendKeyVault(builder, fileName, extension);
                 }
             }
 
@@ -92,13 +101,17 @@ static class AppConfigLoader
         }
     }
 
-    static string[] GetConfigurationGroups(string[] configurationFiles)
+    static List<AppConfigGroup> GetConfigurationGroups(string[] configurationFiles)
     {
         return configurationFiles
-          .Select(Path.GetFileNameWithoutExtension)
-          .Where(name => !name.Contains('.'))
-          .Distinct(StringComparer.OrdinalIgnoreCase)
-          .ToArray();
+            .Select(file => new AppConfigGroup
+            {
+                FullPath = file,
+                Name = Path.GetFileNameWithoutExtension(file),
+                Extension = Path.GetExtension(file)
+            })
+            .Where(x => !x.Name.Contains('.'))
+            .DistinctBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
-
 }

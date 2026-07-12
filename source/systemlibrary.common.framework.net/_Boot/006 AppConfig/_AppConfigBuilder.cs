@@ -27,14 +27,20 @@ internal static class AppConfigBuilder
 
         builder.SetBasePath(AppRootInstance.AppRootPath);
 
-        builder.AddCommandLine(args);
+        if(args.Length > 0)
+            builder.AddCommandLine(args);
 
         return builder;
     }
 
-    internal static ConfigurationBuilder AppendKeyVault(ConfigurationBuilder builder, string jsonFileName)
+    internal static ConfigurationBuilder AppendKeyVault(ConfigurationBuilder builder, string fileName, string extension)
     {
-        AppConfigKeyVault.Add(builder, jsonFileName);
+        AppConfigKeyVault.Add(builder, fileName + extension);
+
+        var environmentName = EnvironmentInstance.EnvironmentName;
+
+        if (environmentName.Is())
+            AppConfigKeyVault.Add(builder, fileName + "." + environmentName + extension);
 
         return builder;
     }

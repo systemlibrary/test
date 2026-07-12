@@ -1,15 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿namespace SystemLibrary.Common.Framework;
 
-namespace SystemLibrary.Common.Framework;
-
-internal static class AppConfigTemp
+internal static class AppConfigVariables
 {
-    /// <summary>
-    /// 'AppSettings' stored as temp, never uses keyvault, as this is used locally to figure out KeyVaultUrl and UserSecretsId if configured
-    /// </summary>
-    internal static IConfigurationRoot Temp { get; }
+    internal static string KeyVaultUrl;
+    internal static bool Debug;
 
-    static AppConfigTemp()
+    static AppConfigVariables()
     {
         var builder = AppConfigBuilder.CreateDefaultBuilder();
 
@@ -17,6 +13,12 @@ internal static class AppConfigTemp
 
         AppConfigBuilder.AddEnvironmentVariables(builder);
 
-        Temp = builder.Build();
+        var temp = builder.Build();
+
+        KeyVaultUrl = temp["systemLibraryCommonFramework:config:keyVaultUrl"];
+        //FrameworkLog.Debug($"'systemLibraryCommonFramework:config:keyVaultUrl' is configured: {keyVaultUrl.MaxLength(16)}.");
+
+        Debug = temp["systemLibraryCommonFramework:app:debug"]?.ToLower() == "true";
+        //FrameworkLog.Debug($"'systemLibraryCommonFramework:app:debug' is true");
     }
 }

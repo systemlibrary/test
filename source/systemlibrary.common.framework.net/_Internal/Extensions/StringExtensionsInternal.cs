@@ -9,23 +9,7 @@ internal static class StringExtensionsInternal
         if (path.IsNot()) return path;
 
         if (path.Contains("\\"))
-        {
             path = path.Replace("\\", "/");
-        }
-
-        if (path.Length > 2)
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                if (path.StartsWith("%HOME%"))
-                    path = path.Replace("%HOME%", "C:");
-            }
-            else
-            {
-                if (path[1] == ':')
-                    path = "%HOME%" + path.Substring(2);
-            }
-        }
 
         if (path.EndsWith('/'))
             path = path.TrimEnd('/');
@@ -41,7 +25,12 @@ internal static class StringExtensionsInternal
             }
         }
 
-        return path.Replace("%HOME%", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+        if (!path.StartsWith("%HOME%"))
+            return path;
+
+        return path
+            .Replace("%HOME%", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
+            .Replace("\\", "/");
     }
 
     internal static bool _PathEndsWith(this string path, string end)

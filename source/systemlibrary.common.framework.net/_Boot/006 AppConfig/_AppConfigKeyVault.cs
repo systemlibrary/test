@@ -10,44 +10,36 @@ using SystemLibrary.Common.Framework.Boostrap;
 
 internal static class AppConfigKeyVault
 {
-    static string KeyVaultUrl;
     static SecretClient Client;
 
     static AppConfigKeyVault()
     {
-        KeyVaultUrl = AppConfigTemp.Temp["systemLibraryCommonFramework:config:keyVaultUrl"];
+        var keyVaultUrl = AppConfigVariables.KeyVaultUrl;
+        if (keyVaultUrl.IsNot()) return;
+        
+        var options = new SecretClientOptions();
 
-        if (KeyVaultUrl.Is())
+        var isDev = EnvironmentInstance.IsDev;
+
+        if (isDev)
         {
-            //FrameworkLog.Debug($"'systemLibraryCommonFramework:config:keyVaultUrl' is configured: {keyVaultUrl.MaxLength(16)}.");
-            var options = new SecretClientOptions();
-
-            var isDev = EnvironmentInstance.IsDev;
-
-            if (isDev)
-            {
-                options.Retry.MaxRetries = 0;
-                options.Retry.NetworkTimeout = TimeSpan.FromSeconds(5);
-            }
-            else
-            {
-                options.Retry.Delay = TimeSpan.FromMilliseconds(1000);
-                options.Retry.MaxRetries = 2;
-                options.Retry.MaxDelay = TimeSpan.FromSeconds(10);
-                options.Retry.NetworkTimeout = TimeSpan.FromSeconds(10);
-            }
-
-            Client = new SecretClient(new Uri(KeyVaultUrl), new DefaultAzureCredential(), options);
+            options.Retry.MaxRetries = 0;
+            options.Retry.NetworkTimeout = TimeSpan.FromSeconds(5);
         }
         else
         {
-            //  FrameworkLog.Debug("'systemLibraryCommonFramework:config:keyVaultUrl' is not configured.");
+            options.Retry.Delay = TimeSpan.FromMilliseconds(1000);
+            options.Retry.MaxRetries = 2;
+            options.Retry.MaxDelay = TimeSpan.FromSeconds(10);
+            options.Retry.NetworkTimeout = TimeSpan.FromSeconds(10);
         }
+
+        Client = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential(), options);
     }
 
     internal static void Add(ConfigurationBuilder builder, string fileName)
     {
-        if (KeyVaultUrl.IsNot()) return;
+        if (AppConfigVariables.KeyVaultUrl.IsNot()) return;
 
         var fetched = Fetch(fileName);
 

@@ -118,7 +118,7 @@ internal static class Methods
                 }
                 catch (Exception ex)
                 {
-                    global::Log.Error(ex);
+              //      global::Log.Error(ex);
 
                     results.Add(default(T));
                 }
@@ -126,7 +126,7 @@ internal static class Methods
         }
         catch (OperationCanceledException)
         {
-            global::Log.Error($"[Methods] Run timed out after {cutoffMs}ms. Collected {results.Count}/{functions.Length} results.");
+           // global::Log.Error($"[Methods] Run timed out after {cutoffMs}ms. Collected {results.Count}/{functions.Length} results.");
         }
 
         return results.ToList();

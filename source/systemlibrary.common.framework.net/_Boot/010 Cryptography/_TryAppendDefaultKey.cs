@@ -1,0 +1,13 @@
+﻿namespace SystemLibrary.Common.Framework.Boostrap;
+
+partial class CryptographyBoot
+{
+    static void TryAppendDefaultKey(List<KeyData> keys)
+    {
+        if (keys.Count == 0)
+        {
+            keys.Add(KeyData.Create("Default", "ABCDEFGHIJKLMNOPQRST123456789011", null));
+            // FrameworkLog.Debug("[Bootstrap.Encryption] Encryption key source: ENVVAR (" + key.MaxLength(3) + "...)");
+        }
+    }
+}

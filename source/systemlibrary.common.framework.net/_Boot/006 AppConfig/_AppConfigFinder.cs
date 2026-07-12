@@ -21,7 +21,7 @@ internal static class AppConfigFinder
 
             return files
                 .Where(x => x.EndsWithAny(StringComparison.OrdinalIgnoreCase, ".json", ".xml", ".config"))
-                .Where(x => Path.GetFileName(x).Count(c => c == '.') <= 3)
+                .Where(x => Path.GetFileName(x).Count(c => c == '.') <= 2)
                 .ToArray();
         }
         catch(Exception ex)

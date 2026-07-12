@@ -1,4 +1,6 @@
-﻿using SystemLibrary.Common.Framework.Extensions;
+﻿using System.Diagnostics;
+
+using SystemLibrary.Common.Framework.Extensions;
 
 namespace SystemLibrary.Common.Framework.Boostrap;
 
@@ -40,12 +42,6 @@ internal static partial class AppConfigBoot
             }
         }
 
-        if (all.IsNot())
-        {
-            //FrameworkLog.Debug("appsettings.json not found at root, default appsettings IConfiguration is created from CLI and some environment variables");
-            all = new[] { "appsettings.json" };
-        }
-
         return all;
     }
 
@@ -69,6 +65,7 @@ internal static partial class AppConfigBoot
             file.Contains("app.config", StringComparison.Ordinal) ||
             file.Contains("web.config", StringComparison.Ordinal) ||
             file.Contains("babelrc.json", StringComparison.Ordinal) ||
+            file.Contains("mstest.framework.extensions", StringComparison.Ordinal) ||
             file.ContainsAny(StringComparison.Ordinal, "packages.json", "packages.xml", "package.json", "package-lock.json"))
             return false;
 
