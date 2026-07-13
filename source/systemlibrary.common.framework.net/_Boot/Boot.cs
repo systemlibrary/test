@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.Loader;
 
 namespace SystemLibrary.Common.Framework.Boostrap;
 
@@ -115,7 +116,7 @@ internal partial class Boot
 
     static void RegisterShutdownEvent()
     {
-        //AssemblyLoadContext.Default.Unloading += _ => LogFlusher.ShutdownFlush();
-        //AppDomain.CurrentDomain.DomainUnload += (s, e) => LogFlusher.ShutdownFlush();
+        AssemblyLoadContext.Default.Unloading += _ => LogFlusher.ShutdownFlush();
+        AppDomain.CurrentDomain.DomainUnload += (s, e) => LogFlusher.ShutdownFlush();
     }
 }

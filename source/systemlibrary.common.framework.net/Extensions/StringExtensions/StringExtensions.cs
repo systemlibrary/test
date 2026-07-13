@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Buffers.Text;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text;
 
@@ -156,4 +157,5 @@ public static partial class StringExtensions
 
         return new string(text.AsSpan(0, maxLength));
     }
+
 }

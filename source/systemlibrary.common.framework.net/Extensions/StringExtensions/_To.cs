@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
+using System.Text;
 
 using SystemLibrary.Common.Framework.Attributes;
 using SystemLibrary.Common.Framework.Extensions;
@@ -118,5 +120,263 @@ partial class StringExtensions
     public static string ToSha256Hash(this string text)
     {
         return Sha256.Compute(text.GetBytes());
+    }
+
+    /// <summary>
+    /// Returns a camel cased string — first letter lowercased, first letter of each subsequent word uppercased.
+    /// Words are delimited by space or dash.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// "abC deF".toCamelCase(); // "abc Def"
+    /// </code>
+    /// </example>
+    public static string toCamelCase(this string text)
+    {
+        if (text.IsNot()) return text;
+
+        if (char.IsUpper(text[0]))
+        {
+            if (!text.Contains(" ") && !text.Contains("-"))
+            {
+                return char.ToLower(text[0]) + text.Substring(1);
+            }
+        }
+        else
+        {
+            if (!text.Contains(" ") && !text.Contains("-"))
+            {
+                return text;
+            }
+        }
+
+        var length = text.Length;
+
+        var sb = new StringBuilder(length);
+
+        sb.Append(char.ToLower(text[0]));
+
+        var c = '0';
+
+        for (int i = 1; i < length; i++)
+        {
+            c = text[i];
+            if (c == ' ')
+            {
+                i++;
+                sb.Append(" " + char.ToUpper(text[i]));
+            }
+            else if (c == '-')
+            {
+                i++;
+                sb.Append("-" + char.ToUpper(text[i]));
+            }
+            else
+            {
+                sb.Append(char.ToLower(c));
+            }
+        }
+
+        return sb.ToString();
+    }
+
+
+
+    static string[] excludedNamespaces = new[] {
+        "System.",
+        "Microsoft",
+        "Windows",
+        "MSBuild",
+        "Castle.",
+        "Owin",
+        "StructureMap",
+        "EntityFramework",
+        "EPiServer",
+        "Umbraco",
+        "Newtonsoft",
+        "Swashbuckle.",
+        "RestSharp.",
+        "GraphQL.",
+        "log4net.",
+        "MSTest.",
+        "VSTest.",
+        "Serilog.",
+        "nlog",
+        "ElasticSearch",
+        "Remotion.",
+        "YamlDotNet",
+        "Antlr.",
+        "ClearScript",
+        "AWS",
+        "SharpZipLib",
+        "Azure.",
+        "NuGet.",
+        "Salesforce.",
+        "React.",
+        "moq",
+        "Moq",
+        "automapper",
+        "AutoMapper",
+        "Autofac",
+        "Dapper",
+        "testhost",
+        "netstandard",
+        "nunit.",
+        "xunit.",
+        "Polly.",
+        "runtime.win",
+        "FluentValidation.",
+        "FluentAssertions.",
+        "StackExchange.",
+        "AutoFixture.",
+        "Modernizr.",
+        "DocumentFormat.OpenXml",
+        "NLog.",
+        "IdentityModel.",
+        "coverlet.",
+        "MediatR.",
+        "StyleCop.",
+        "Hangfire.",
+        "Npgsql.",
+        "NSubstitute.",
+        "NJsonSchema.",
+        "SendGrid",
+        "Portable.BouncyCastle.",
+        "RabbitMQ.",
+        "SQLitePCLRaw.",
+        "CsvHelper.",
+        "Elasticsearch.",
+        "MongoDB.",
+        "WebGrease.",
+        "Google.",
+        "jQuery.",
+        "JetBrains.",
+        "NodaTime.",
+        "Selenium.",
+        "CommandLineParser.",
+        "WebActivatorEx.",
+        "MailKit.",
+        "protobuf-net.",
+        "Unity.",
+        "MySql.Data.",
+        "Xamarin.",
+        "NuGet.Packaging.",
+        "FluentEmail.",
+        "Grpc."
+    };
+
+    static string GetNonNoiseFrameName(MethodBase m)
+    {
+        var t = m.DeclaringType;
+        if (t == null) return null;
+
+        var ns = t.Namespace;
+        if (ns == null) return null;
+
+        if (ns == "System") return null;
+
+        if (ns.StartsWithAny(excludedNamespaces))
+            return null;
+
+        return ns + "." + t.Name + "." + m.Name;
+    }
+
+
+    /// <summary>
+    /// Returns a display-friendly stack trace filtered to remove framework and test runner noise.
+    /// </summary>
+    public static string ToFriendlyStackTrace(this StackTrace stackTrace)
+    {
+        if (stackTrace == null) return null;
+
+        var frames = stackTrace.GetFrames();
+
+        var sb = new StringBuilder(200);
+
+        var methodEnding = "()" + Environment.NewLine;
+
+        for (int i = 0; i < frames.Length; i++)
+        {
+            var frame = frames[i];
+
+            var methodBase = frame.GetMethod();
+
+            var name = GetNonNoiseFrameName(methodBase);
+
+            if (name == null)
+            {
+                if (methodBase.Name == "InvokeMethod" &&
+                    methodBase.DeclaringType?.Namespace == "System")
+                {
+                    break;
+                }
+
+                continue;
+            }
+
+            if (i == 3)
+                sb.Append("at ");
+            else
+                sb.Append(" at ");
+
+            sb.Append(name);
+            sb.Append(methodEnding);
+        }
+
+        sb.TrimEnd(Environment.NewLine);
+
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Returns a display-friendly stack trace string filtered to remove framework and test runner noise.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// var trace = Environment.StackTrace.ToFriendlyStackTrace();
+    /// </code>
+    /// </example>
+    public static string ToFriendlyStackTrace(this string stackTrace)
+    {
+        if (stackTrace == null || stackTrace.Length == 0) return stackTrace;
+
+        try
+        {
+            var traces = stackTrace.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+
+            if (traces.Length == 0) return stackTrace;
+
+            var stackTraceBuilder = new StringBuilder("");
+
+            var end = Math.Min(traces.Length, 9);
+
+            for (int i = 0; i < end; i++)
+            {
+                if (traces[i].StartsWithAny(
+                    "   at System.RuntimeMethodHandle.",
+                    "   at System.Reflection.RuntimeMethodInfo",
+                    "   at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.MSTestExecutor.<>c__DisplayClass",
+                    "   at lambda_method"))
+                {
+                    break;
+                }
+
+                if (traces[i].StartsWithAny(
+                    "   at SystemLibrary.Common.Framework.LoggerMessageBuilder.",
+                    "   at LoggerRateLimiter.Flush",
+                    "   at System.Environment.get_"))
+                {
+                    continue;
+                }
+
+                if (i < Math.Min(traces.Length, 9) - 1)
+                    stackTraceBuilder.Append("\t" + traces[i].TrimStart() + "\n");
+            }
+            return stackTraceBuilder.ToString().TrimStart('\t').TrimEnd("\n");
+        }
+        catch
+        {
+            return "unknown";
+        }
     }
 }

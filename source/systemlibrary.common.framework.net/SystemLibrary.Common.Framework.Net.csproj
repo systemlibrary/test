@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	
+
 	<PropertyGroup>
 		<RootNamespace>SystemLibrary.Common.Framework</RootNamespace>
 		<RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
@@ -10,7 +10,7 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Configurations>Release;Debug</Configurations>
 	</PropertyGroup>
-
+	
 	<PropertyGroup Condition="'$(Configuration)' == 'DEBUG'">
 		<DefineConstants>DEBUG</DefineConstants>
 	</PropertyGroup>

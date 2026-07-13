@@ -1,18 +1,28 @@
 ﻿namespace SystemLibrary.Common.Framework;
 
-public enum LogForward
+/// <summary>
+/// Forward all log invocations to either STD or File Writer
+/// </summary>
+/// <remarks>
+/// Registering your own ILogWriter always wins, then these settings dont matter
+/// Not registering an ILogWriter, and you control wether or not to use the STD or File writer internally
+/// </remarks>
+public enum LogWriterType
 {
     /// <summary>
-    /// Send all log invocations to stderr and stdout
-    /// </summary>
-    LogToStd,
-    /// <summary>
-    ///  Send all log invocations to ILogWriter
+    /// Sends all log invocations to stderr and stdout
     /// </summary>
     /// <remarks>
-    /// If not implemented a custom, an internal FileWriter is used to dump logs and a message is logged as a warning that you havent implemented one yet or registered it at least as a service in DI
+    /// INjecting your own ILogWriter always takes precedence.
     /// </remarks>
-    LogToLogWriter
+    Std,
+    /// <summary>
+    /// Sends all log invocations to ILogWriter
+    /// </summary>
+    /// <remarks>
+    /// INjecting your own ILogWriter always takes precedence.
+    /// </remarks>
+    File
 }
 
 public enum StdForward
