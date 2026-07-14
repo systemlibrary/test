@@ -10,11 +10,9 @@ internal static class ConfigFinder
     {
         var configurationName = type.Name.ToLower();
 
-        BootstrapLog.Write(type.Name + " find config");
         if (AppConfigInstance.Configurations.ContainsKey(configurationName))
             return AppConfigInstance.Configurations[configurationName];
         
-
         return AppConfigInstance.Configurations["appsettings"];
     }
 }
