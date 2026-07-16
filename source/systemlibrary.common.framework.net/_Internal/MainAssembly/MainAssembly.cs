@@ -2,6 +2,8 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
+using SystemLibrary.Common.Framework.Boostrap;
+
 namespace SystemLibrary.Common.Framework;
 
 internal static class MainAssembly
@@ -9,12 +11,24 @@ internal static class MainAssembly
     static string[] BlacklistedEntryNames =
     {
         "testhost",
-        "Microsoft.",
+        "BenchmarkDotNet.",
+        "Microsoft.TestPlatform.",
+        "Microsoft.VisualStudio.TestPlatform.",
+        "MSTest.",
+        "MSTestAdapter.",
+        "NUnit.",
+        "xunit.",
+        "JetBrains.",
+        "ReSharperTestRunner.",
+        "coverlet.",
+        "Mono.Cecil.",
         "System.",
+        "Microsoft.",
         "Azure.",
         "AWS.",
-        "AWSSDK",
-        "Serilog"
+        "AWSSDK.",
+        "Newtonsoft.",
+        "Serilog."
     };
 
     public static string FullName;
@@ -62,8 +76,6 @@ internal static class MainAssembly
             if (name?.Length == 12 && name.StartsWith("Job-"))
                 return true;
 
-            if (name?.EndsWith("Tests") == true) return true;
-
             return name.StartsWithAny(BlacklistedEntryNames);
         }
 
@@ -77,7 +89,7 @@ internal static class MainAssembly
         {
             i++;
 
-            if (i > 12) break;
+            if (i > 36) break;
 
             asm = frame.GetMethod()?.DeclaringType?.Assembly;
 
@@ -94,7 +106,7 @@ internal static class MainAssembly
             break;
         }
 
-        if (i > 12)
+        if (i > 36)
         {
             asm = Assembly.GetEntryAssembly();
         }

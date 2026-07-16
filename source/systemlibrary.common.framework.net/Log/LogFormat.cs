@@ -4,5 +4,7 @@ internal enum LogFormat
 {
     Text = 0,
 
-    Json = 1
+    Json = 1,
+
+    NDJson = 2
 }

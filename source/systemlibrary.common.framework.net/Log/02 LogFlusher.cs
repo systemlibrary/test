@@ -11,25 +11,24 @@ internal class LogFlusher
     static LogFlusher()
     {
         Writer = ServiceProviderInstance.Current.GetService<ILogWriter>();
-
         if (Writer == null)
         {
             string message;
-            if (LogInstance.LogForward == LogWriterType.File)
+
+            if (LogInstance.LogType == LogType.File)
             {
                 message = "[Common.Framework] File log writer";
                 Writer = new FileLogWriter();
-
             }
             else
             {
                 message = "[Common.Framework] Standard log writer";
                 Writer = new StdLogWriter();
             }
-            
-            if(LogInstance.MinLogLevel <= LogLevel.Information)
+
+            if (LogInstance.MinLogLevel <= LogLevel.Information)
             {
-                var logMessage = new LogMessage(LogLevel.Information, message + " " + LogInstance.MinLogLevel.ToString());
+                var logMessage = new LogMessage(LogLevel.Information, new object[] { message, LogInstance.MinLogLevel.ToString() });
                 Writer.Write(logMessage);
             }
         }
@@ -43,11 +42,12 @@ internal class LogFlusher
 
     internal static void ShutdownFlush()
     {
+        BootstrapLog.Write("ShutdownFlush()");
+
         if (Interlocked.Exchange(ref Shutdown, 1) == 1)
             return;
 
         Dequeue();
-
         Thread.Sleep(33);
     }
 
@@ -56,16 +56,16 @@ internal class LogFlusher
         try
         {
             Dequeue();
-
-            LogQueue.Reset();
-
-            if (!LogQueue.Queue.IsEmpty)
-                LogQueue.StartTimer();
         }
         catch
         {
-            // swallow
+            Console.Error.WriteLine("Error in LogFlusher.Dequeue, continue...");
         }
+
+        LogQueue.Reset();
+
+        if (!LogQueue.Queue.IsEmpty)
+            LogQueue.StartTimer();
     }
 
     static void Dequeue()

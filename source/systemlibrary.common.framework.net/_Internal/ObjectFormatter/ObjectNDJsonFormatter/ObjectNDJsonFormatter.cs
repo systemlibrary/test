@@ -5,20 +5,20 @@ using System.Text.Json.Serialization.Metadata;
 
 namespace SystemLibrary.Common.Framework.Extensions;
 
-internal static class ObjectJsonFormatter
+internal static class ObjectNDJsonFormatter
 {
     static JsonStringEnumConverter JsonStringEnumConverter;
 
     static JsonSerializerOptions JsonOptions;
 
-    static ObjectJsonFormatter()
+    static ObjectNDJsonFormatter()
     {
         JsonStringEnumConverter = new JsonStringEnumConverter();
 
         JsonOptions = new System.Text.Json.JsonSerializerOptions
         {
             DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
-            WriteIndented = true,
+            WriteIndented = false,
             MaxDepth = 5,
             IncludeFields = true,
             IgnoreReadOnlyProperties = false,

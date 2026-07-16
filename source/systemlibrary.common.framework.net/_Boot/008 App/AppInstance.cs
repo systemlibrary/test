@@ -9,8 +9,6 @@ internal static class AppInstance
     internal static int Salt;
     internal static string HostName;
 
-    internal static int Hosting;
-
     static AppInstance()
     {
         Boot.Strap();

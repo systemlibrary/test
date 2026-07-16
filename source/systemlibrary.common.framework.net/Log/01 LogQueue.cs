@@ -1,6 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 
+using SystemLibrary.Common.Framework.Boostrap;
+
 namespace SystemLibrary.Common.Framework;
 
 internal class LogQueue
@@ -33,7 +35,7 @@ internal class LogQueue
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
-    internal static void Add(LogLevel level, object[] obj)
+    internal static void Add(LogLevel level, object[] message)
     {
         var count = Interlocked.Increment(ref QueueCounter);
 
@@ -49,9 +51,9 @@ internal class LogQueue
                 return;
         }
 
-        var message = new LogMessage(level, obj);
+        var logMessage = new LogMessage(level, message);
 
-        Queue.Enqueue(message);
+        Queue.Enqueue(logMessage);
 
         StartTimer();
     }

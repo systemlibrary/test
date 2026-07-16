@@ -25,13 +25,13 @@ public class LogMessage
     ];
 
     [Display(Order = 1)]
-    public DateTime Timestamp;
+    public DateTimeOffset Timestamp;
 
     [Display(Order = 5)]
     public LogLevel Level;
 
     [Display(Order = 10)]
-    public object Messages;
+    public object Message;
 
     [Display(Order = 15)]
     public string CorrelationId;
@@ -48,11 +48,15 @@ public class LogMessage
     [Display(Order = 999)]
     public StackTrace StackTrace;
 
-    public LogMessage(LogLevel level, object messages)
+
+    public LogMessage(LogLevel level, object[] messages)
     {
-        Timestamp = DateTime.UtcNow;
+        Timestamp = DateTimeOffset.UtcNow;
         Level = level;
-        Messages = messages;
+        if (messages.Length == 1)
+            Message = messages[0];
+        else
+            Message = messages;
 
         if (level != LogLevel.Dump)
         {
@@ -108,10 +112,10 @@ public class LogMessage
 
         if (userAgent.Length < 5) return "";
 
-        if (userAgent.Contains("Chrome", StringComparison.OrdinalIgnoreCase)) return "Chrome";
         if (userAgent.Contains("Safari", StringComparison.OrdinalIgnoreCase)) return "Safari";
         if (userAgent.Contains("Edg", StringComparison.OrdinalIgnoreCase)) return "Edge";
         if (userAgent.Contains("Brave", StringComparison.OrdinalIgnoreCase)) return "Brave";
+        if (userAgent.Contains("Chrome", StringComparison.OrdinalIgnoreCase)) return "Chrome";
         if (userAgent.Contains("Firefox", StringComparison.OrdinalIgnoreCase)) return "Firefox";
         if (userAgent.Contains("OPR", StringComparison.OrdinalIgnoreCase) || userAgent.Contains("Opera", StringComparison.OrdinalIgnoreCase)) return "Opera";
 

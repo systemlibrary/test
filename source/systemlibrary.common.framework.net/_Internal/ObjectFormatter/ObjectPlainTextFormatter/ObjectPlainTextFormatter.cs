@@ -5,10 +5,18 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
+
+using SystemLibrary.Common.Framework.Boostrap;
 
 namespace SystemLibrary.Common.Framework.Extensions;
 
+/// <summary>
+/// TODO: Total refactor, restructure into proper methods and reusable methods, and lists of configurations that makes this extensible
+/// Fix: Maximum amount of 'message.Len' to be, say, 1024K chars.
+/// Fix: Maximum amount of printed items in IEnumerables per IEnumerable to be 128K.
+/// </summary>
 internal static class ObjectPlainTextFormatter
 {
     internal static ConcurrentDictionary<int, PropertyInfo[]> TypeProperties = new ConcurrentDictionary<int, PropertyInfo[]>();
@@ -305,9 +313,11 @@ internal static class ObjectPlainTextFormatter
 
     static void AppendEnumerableTypeName(StringBuilder message, IEnumerable enumerable, int level, Type type, Type type2, Type[] args, int count)
     {
+        // Enumearble types of Object, we do not print that as a prefix
+        if (type == SystemType.ObjectType) return;
+
         if (args == null || args.Length == 0)
             Add(message, PrintTypeName(type) + "[] (" + count + ")", level);
-
         else
         {
             if (enumerable is IDictionary)
@@ -359,7 +369,7 @@ internal static class ObjectPlainTextFormatter
 
         if (ObjectFormatterBlacklist.ClassNames.Contains(type.Name)) return true;
 
-        var reference = obj.GetHashCode();
+        var reference = RuntimeHelpers.GetHashCode(obj);
 
         if (IsVisited(type, reference, visited))
         {
@@ -376,7 +386,14 @@ internal static class ObjectPlainTextFormatter
                     !ObjectFormatterBlacklist.ClassNames.Contains(p.PropertyType.Name) &&
                     (p.GetCustomAttribute<BrowsableAttribute>()?.Browsable ?? true)
                 )
-                .OrderBy(p => p.GetCustomAttribute<DisplayAttribute>()?.GetOrder() ?? int.MaxValue)
+                .OrderBy(p =>
+                {
+                    var index = options.MemberOrder?.IndexOf(p.Name) ?? -1;
+
+                    if (index >= 0) return index;
+
+                    return 1000 + (p.GetCustomAttribute<DisplayAttribute>()?.GetOrder() ?? int.MaxValue);
+                })
                 .ToArray();
         });
 
@@ -387,7 +404,14 @@ internal static class ObjectPlainTextFormatter
                     !ObjectFormatterBlacklist.ClassNames.Contains(f.FieldType.Name) &&
                     (f.GetCustomAttribute<BrowsableAttribute>()?.Browsable ?? true)
                 )
-                .OrderBy(f => f.GetCustomAttribute<DisplayAttribute>()?.GetOrder() ?? int.MaxValue)
+                .OrderBy(p =>
+                {
+                    var index = options.MemberOrder?.IndexOf(p.Name) ?? -1;
+
+                    if (index >= 0) return index;
+
+                    return 1000 + (p.GetCustomAttribute<DisplayAttribute>()?.GetOrder() ?? int.MaxValue);
+                })
                 .ToArray();
         });
 
@@ -433,8 +457,7 @@ internal static class ObjectPlainTextFormatter
 
                     if (options.ExcludeNullMembers && value == null) continue;
 
-                    Add(message, property.Name + ": ", level);
-
+                    Add(message, property.Name + ": ", level - 1);
 
                     var sb = new StringBuilder(128);
 
@@ -487,15 +510,15 @@ internal static class ObjectPlainTextFormatter
 
                     var sb = new StringBuilder(128);
 
-                    if (field.Name[0] == 'M' &&
-                       type.Name == "LogMessage" &&
-                       (field.Name == "Messages" || field.Name == "Message"))
-                    {
-                    }
-                    else
-                    {
-                        Add(message, field.Name + ": ", level);
-                    }
+                    //if (field.Name[0] == 'M' &&
+                    //   type.Name == "LogMessage" &&
+                    //   (field.Name == "Messages" || field.Name == "Message"))
+                    //{
+                    //}
+                    //else
+                    //{
+                    Add(message, field.Name + ": ", level - 1);
+                    //}
 
                     if (value is string text && ObjectFormatterObfuscate.MemberNames.Contains(field.Name))
                     {
@@ -613,9 +636,9 @@ internal static class ObjectPlainTextFormatter
 
         if (obj is StringBuilder sb) return PrintString(sb.ToString());
 
-        if (obj is DateTime dt) return dt.ToString("yyyy-MM-dd HH:mm:ss.fffzzz");
+        if (obj is DateTime dt) return dt.ToString(FormatInstance.DateTimeFormat);
 
-        if (obj is DateTimeOffset dto) return dto.ToString("yyyy-MM-dd HH:mm:ss.fffzzz");
+        if (obj is DateTimeOffset dto) return dto.ToString(FormatInstance.DateTimeOffsetFormat);
 
         if (obj is Enum enu) return PrintEnum(enu);
 
@@ -755,8 +778,9 @@ internal static class ObjectPlainTextFormatter
     {
         var value = (item as Enum).ToValue();
 
-        if (value.Is())
-            return (item as Enum).ToText() + " (" + value + ")";
+        var text = (item as Enum).ToText();
+        if (value.Is() && text != value)
+            return text + " (" + value + ")";
 
         return (item as Enum).ToText();
     }

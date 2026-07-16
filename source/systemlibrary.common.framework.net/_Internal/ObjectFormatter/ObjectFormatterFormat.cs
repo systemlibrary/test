@@ -3,5 +3,6 @@
 public enum ObjectFormatterFormat
 {
     Plain,
-    Json
+    Json,
+    NDJson
 }

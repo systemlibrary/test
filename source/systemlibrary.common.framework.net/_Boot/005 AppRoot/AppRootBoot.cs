@@ -20,7 +20,7 @@ internal static class AppRootBoot
         var tmp = path;
         int max = 10;
 
-        while (IsInBinOrLib(tmp))
+        while (IsInBin(tmp))
         {
             tmp = new DirectoryInfo(tmp).Parent?.FullName;
 
@@ -31,7 +31,10 @@ internal static class AppRootBoot
             if (max <= 0) break;
         }
 
-        if (path == tmp || tmp.IsNot()) return CleanRootPath(path);
+        if (path == tmp || tmp.IsNot())
+        {
+            return CleanRootPath(path);
+        }
 
         if (IsTestProjectByFolderNamingConvention(tmp))
         {
@@ -62,10 +65,9 @@ internal static class AppRootBoot
         return AppRootInstance.AppRootPath;
     }
 
-    static bool IsInBinOrLib(string dir)
+    static bool IsInBin(string dir)
     {
-        return dir._PathContains("/lib/") || dir._PathEndsWith("/lib") ||
-               dir._PathContains("/bin/") || dir._PathEndsWith("/bin");
+        return dir._PathContains("/bin/") || dir._PathEndsWith("/bin");
     }
 
     static bool IsTestProjectByFolderNamingConvention(string dir)

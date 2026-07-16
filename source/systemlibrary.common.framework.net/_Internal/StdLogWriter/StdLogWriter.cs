@@ -4,42 +4,37 @@ internal class StdLogWriter : ILogWriter
 {
     public void Write(LogMessage message)
     {
-        var text = LogFormatter.Format(message);
+        var text = LogFormatter.Format(message).Append(Environment.NewLine);
 
-        Console.Out.WriteLine(text);
+        var startsWithTab = text?.Length > 1 && text[0] == '\t';
 
+        if (Log.SupportsAnsi)
+        {
+            var color = "\u001b[92m";
 
-        //var topic = "[Common.Framework]";
-        //var color = "\u001b[92m";
-        //var hasTab = message.StartsWith("\t");
+            if (startsWithTab)
+            {
+                color = "\u001b[96m";
 
-        //if (hasTab)
-        //{
-        //    topic = "";
-        //    color = "\u001b[96m";
-        //}
+                Console.WriteLine(color + text + "\u001b[0m");
+            }
+            else
+            {
+                Console.WriteLine(color + "\u001b[0m" + text);
+            }
+        }
+        else
+        {
+            if (startsWithTab)
+            {
+                Console.WriteLine(text);
+            }
+            else
+            {
+                var topic = "[" + message.Level + "] ";
 
-        //if (Log.SupportsAnsi)
-        //{
-        //    if (hasTab)
-        //    {
-        //        Console.WriteLine(color + message + "\u001b[0m");
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine(color + topic + "\u001b[0m " + message);
-        //    }
-        //}
-        //else
-        //{
-        //    if (hasTab)
-        //    {
-        //        Console.WriteLine(message);
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine(topic + " " + message);
-        //    }
-        //}
+                Console.WriteLine(text);
+            }
+        }
     }
 }

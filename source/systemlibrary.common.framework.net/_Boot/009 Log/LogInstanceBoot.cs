@@ -16,7 +16,7 @@ static class LogBoot
 
         LogInstance.Format = settings.Format;
         LogInstance.StdForward = settings.StdForward;
-        LogInstance.LogForward = settings.LogForward;
+        LogInstance.LogType = settings.LogForward;
 
         InitializeLogFilePath();
     }

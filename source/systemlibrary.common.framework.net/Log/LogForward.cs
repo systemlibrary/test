@@ -7,7 +7,7 @@
 /// Registering your own ILogWriter always wins, then these settings dont matter
 /// Not registering an ILogWriter, and you control wether or not to use the STD or File writer internally
 /// </remarks>
-public enum LogWriterType
+public enum LogType
 {
     /// <summary>
     /// Sends all log invocations to stderr and stdout
@@ -20,7 +20,7 @@ public enum LogWriterType
     /// Sends all log invocations to ILogWriter
     /// </summary>
     /// <remarks>
-    /// INjecting your own ILogWriter always takes precedence.
+    /// Injecting your own ILogWriter always takes precedence.
     /// </remarks>
     File
 }

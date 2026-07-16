@@ -41,7 +41,8 @@ internal static class StringExtensionsInternal
             return true;
 
         return end.Contains('/') &&
-               path.Replace('\\', '/').EndsWith(end, StringComparison.OrdinalIgnoreCase);
+            path.Contains("\\") &&
+            path.Replace('\\', '/').EndsWith(end, StringComparison.OrdinalIgnoreCase);
     }
 
     internal static bool _PathContains(this string path, string contains)
@@ -51,7 +52,8 @@ internal static class StringExtensionsInternal
         if (path.Contains(contains, StringComparison.OrdinalIgnoreCase)) return true;
 
         return contains.Contains('/') &&
-               path.Replace('\\', '/').Contains(contains, StringComparison.OrdinalIgnoreCase);
+               path.Contains("\\") &&
+               path.Replace("\\", "/").Contains(contains, StringComparison.OrdinalIgnoreCase);
     }
 
     internal static bool _IsJson(this string data)

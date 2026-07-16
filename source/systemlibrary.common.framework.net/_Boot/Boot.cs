@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Runtime.Loader;
+﻿using System.Runtime.Loader;
 
 namespace SystemLibrary.Common.Framework.Boostrap;
 
@@ -7,8 +6,11 @@ internal class BootstrapLog
 {
     public static void Write(object o)
     {
-        //Console.Error.WriteLine("Bootlog: " + o + "");
-        //System.IO.File.AppendAllText(@"C:\logs\log.txt", "Bootlog: " + o + "\n");
+        var m = "[BootLog] " + o + "\n";
+
+        Console.Out.WriteLine(m);
+
+        System.IO.File.AppendAllText(@"C:\logs\log.txt", m);
     }
 }
 internal partial class Boot
@@ -65,9 +67,11 @@ internal partial class Boot
 
             BootstrapLog.Write("FrameworkSettings Done");
 
-            AppInstanceBoot.Strap();
+            AppBoot.Strap();
 
             BootstrapLog.Write("AppInstanceBoot Done");
+
+            FormatBoot.Strap();
 
             LogBoot.Strap();
 
@@ -116,6 +120,7 @@ internal partial class Boot
 
     static void RegisterShutdownEvent()
     {
+        BootstrapLog.Write("Event Registered");
         AssemblyLoadContext.Default.Unloading += _ => LogFlusher.ShutdownFlush();
         AppDomain.CurrentDomain.DomainUnload += (s, e) => LogFlusher.ShutdownFlush();
     }

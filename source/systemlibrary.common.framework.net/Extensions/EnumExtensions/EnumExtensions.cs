@@ -164,4 +164,11 @@ public static class EnumExtensions
         }
         return default;
     }
+
+    public static T ToEnum<T>(this Enum enumKey) where T : struct, IComparable, IFormattable, IConvertible
+    {
+        if (enumKey == null) return default(T);
+
+        return enumKey.ToValue().ToEnum<T>();
+    }
 }
