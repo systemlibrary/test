@@ -42,13 +42,12 @@ internal class LogFlusher
 
     internal static void ShutdownFlush()
     {
-        BootstrapLog.Write("ShutdownFlush()");
-
         if (Interlocked.Exchange(ref Shutdown, 1) == 1)
             return;
 
         Dequeue();
-        Thread.Sleep(33);
+
+        Thread.Sleep(66);
     }
 
     internal static void Flush(object state = null)

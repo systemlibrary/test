@@ -3,6 +3,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
+using SystemLibrary.Common.Framework.Boostrap;
+
 namespace SystemLibrary.Common.Framework.Extensions;
 
 internal static class ObjectJsonFormatter
@@ -36,27 +38,35 @@ internal static class ObjectJsonFormatter
         {
             Modifiers =
             {
-                ti =>
-                {
-                    if(ti.Properties != null)
-                    {
-                        foreach (var prop in ti.Properties)
-                        {
-                            if(prop?.Name == null) continue;
+                 ti => {
+                    if (ti.Properties == null) return;
 
-                            if (blackListedMemberNames.Contains(prop.Name))
+                    foreach (var prop in ti.Properties)
+                    {
+                        if(prop?.Name == null) continue;
+
+                        if (blackListedMemberNames.Contains(prop.Name))
+                        {
+                            prop.ShouldSerialize = (obj, value) => false;
+                        }
+                        else if (obfuscatedMemberNames.Contains(prop.Name))
+                        {
+                            prop.CustomConverter = new ObjectJsonFormatterStringConverter();
+                        }
+                    }
+
+                    var memberOrder = FormatInstance.ObjectTextFormatterMemberOrder;
+                    if(memberOrder?.Length > 0)
+                    {
+                        for (int i = 0; i < memberOrder.Length; i++)
+                        {
+                            var memberName = memberOrder[i];
+
+                            var property = ti.Properties.FirstOrDefault(x => x.Name.Equals(memberName, StringComparison.OrdinalIgnoreCase));
+
+                            if (property != null)
                             {
-                                prop.ShouldSerialize = (obj, value) =>
-                                {
-                                    return false;
-                                };
-                            }
-                            else
-                            {
-                                if(obfuscatedMemberNames.Contains(prop.Name))
-                                {
-                                    prop.CustomConverter = new ObjectJsonFormatterStringConverter();
-                                }
+                                property.Order = -1000 + i;
                             }
                         }
                     }

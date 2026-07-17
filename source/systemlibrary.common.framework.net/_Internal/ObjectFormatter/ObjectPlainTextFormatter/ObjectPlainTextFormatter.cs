@@ -388,7 +388,7 @@ internal static class ObjectPlainTextFormatter
                 )
                 .OrderBy(p =>
                 {
-                    var index = options.MemberOrder?.IndexOf(p.Name) ?? -1;
+                    var index = FormatInstance.ObjectTextFormatterMemberOrder?.IndexOf(p.Name) ?? -1;
 
                     if (index >= 0) return index;
 
@@ -406,7 +406,7 @@ internal static class ObjectPlainTextFormatter
                 )
                 .OrderBy(p =>
                 {
-                    var index = options.MemberOrder?.IndexOf(p.Name) ?? -1;
+                    var index = FormatInstance.ObjectTextFormatterMemberOrder?.IndexOf(p.Name) ?? -1;
 
                     if (index >= 0) return index;
 

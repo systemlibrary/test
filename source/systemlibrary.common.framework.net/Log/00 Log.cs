@@ -146,5 +146,8 @@ public static class Log
         }
     }
 
-    internal static bool SupportsAnsi = !Console.IsOutputRedirected;
+    internal static bool SupportsAnsi =
+        !Console.IsOutputRedirected &&
+        !Console.IsErrorRedirected &&
+        EnvironmentInstance.GetEnvironmentVariable("NO_COLOR") != null;
 }

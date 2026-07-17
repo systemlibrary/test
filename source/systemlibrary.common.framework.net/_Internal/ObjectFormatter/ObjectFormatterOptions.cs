@@ -19,9 +19,4 @@ public class ObjectFormatterOptions
     /// </summary>
     public ObjectFormatterFormat Format = ObjectFormatterFormat.Plain;
 
-    /// <summary>
-    /// Order members, first as the top member, if you need to override the way attribute order doesnt please the environment
-    /// In dev you might want "Level" first, while in other env you want timestamp, for a "class LogMessage" for instance"
-    /// </summary>
-    public string[] MemberOrder;
 }

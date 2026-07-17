@@ -1,40 +1,47 @@
-﻿namespace SystemLibrary.Common.Framework;
+﻿using SystemLibrary.Common.Framework.Extensions;
+
+namespace SystemLibrary.Common.Framework;
 
 internal class StdLogWriter : ILogWriter
 {
     public void Write(LogMessage message)
     {
-        var text = LogFormatter.Format(message).Append(Environment.NewLine);
-
-        var startsWithTab = text?.Length > 1 && text[0] == '\t';
+        var text = LogFormatter.Format(message);
 
         if (Log.SupportsAnsi)
         {
-            var color = "\u001b[92m";
-
-            if (startsWithTab)
+            switch (message.Level)
             {
-                color = "\u001b[96m";
+                case LogLevel.Debug:
+                case LogLevel.Dump:
+                    text.AppendAnsiColor(AnsiColor.Cyan);
+                    break;
 
-                Console.WriteLine(color + text + "\u001b[0m");
+                case LogLevel.Information:
+                    text.AppendAnsiColor(AnsiColor.Green);
+                    break;
+
+                case LogLevel.Warning:
+                    text.AppendAnsiColor(AnsiColor.Yellow);
+                    break;
+
+                case LogLevel.Error:
+                    text.AppendAnsiColor(AnsiColor.Red);
+                    break;
+
+                case LogLevel.Critical:
+                    text.AppendAnsiColor(AnsiColor.DarkRed);
+                    break;
             }
-            else
-            {
-                Console.WriteLine(color + "\u001b[0m" + text);
-            }
+        }
+
+        if (message.Level > LogLevel.Warning)
+        {
+            Console.Error.WriteLine(text);
         }
         else
         {
-            if (startsWithTab)
-            {
-                Console.WriteLine(text);
-            }
-            else
-            {
-                var topic = "[" + message.Level + "] ";
-
-                Console.WriteLine(text);
-            }
+            Console.Out.WriteLine(text);
         }
     }
 }

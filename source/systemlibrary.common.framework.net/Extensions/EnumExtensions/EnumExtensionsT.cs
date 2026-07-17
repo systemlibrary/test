@@ -1,8 +1,4 @@
-﻿using System.Reflection;
-
-using SystemLibrary.Common.Framework.Attributes;
-
-namespace SystemLibrary.Common.Framework.Extensions;
+﻿namespace SystemLibrary.Common.Framework.Extensions;
 
 /// <summary>
 /// Static methods for enum types — use when extension methods on generic types are needed.
@@ -23,6 +19,7 @@ public static class EnumExtensions<TEnum> where TEnum : IComparable, IFormattabl
     public static IEnumerable<string> GetKeys()
     {
         var type = typeof(TEnum);
+
         if (!type.IsEnum) throw new Exception("Could not get values from a non-enum object. " + type.Name + " is not an Enum");
 
         var values = Enum.GetValues(type);

@@ -1,11 +1,11 @@
 ﻿using System.Text;
 
-using SystemLibrary.Common.Framework.Boostrap;
-
 namespace SystemLibrary.Common.Framework.Extensions;
 
 internal static class ObjectFormatter
 {
+    static bool InvalidFormatErrorLogged;
+
     internal static StringBuilder Format(object message, ObjectFormatterOptions options)
     {
         options = options ?? new ObjectFormatterOptions();
@@ -27,6 +27,14 @@ internal static class ObjectFormatter
             return ObjectNDJsonFormatter.Format(message, options);
         }
 
-        throw new Exception("Format " + ((int)format) + " is not supported, must be 0-1");
+        if (!InvalidFormatErrorLogged)
+        {
+            InvalidFormatErrorLogged = true;
+            var supported = EnumExtensions<ObjectFormatterFormat>.GetKeys();
+
+            FrameworkLog.Error("Format " + ((int)format) + " is not supported. " + string.Join(", ", supported));
+        }
+
+        return ObjectPlainTextFormatter.Format(message, options);
     }
 }

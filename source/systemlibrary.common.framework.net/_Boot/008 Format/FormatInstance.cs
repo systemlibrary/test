@@ -6,6 +6,7 @@ internal static class FormatInstance
 {
     internal static string DateTimeFormat;
     internal static string DateTimeOffsetFormat;
+    internal static string[] ObjectTextFormatterMemberOrder;
 
     static FormatInstance()
     {

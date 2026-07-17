@@ -36,7 +36,7 @@ static class LogBoot
         }
         catch (Exception ex)
         {
-            FrameworkLog.Critical("Log directory was not created: " + ex.Message + ". FullFilePath: " + LogInstance.FullFilePath);
+            FrameworkLog.Error("Log directory was not created: " + ex.Message + ". FullFilePath: " + LogInstance.FullFilePath);
             //BootstrapLog.Error(Directory could not be created: " + ex.Message);
         }
     }

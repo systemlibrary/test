@@ -26,7 +26,11 @@ public abstract partial class Config<T> where T : class
                 });
 
                 if (_Current == null)
-                    throw new Exception(type.Name + ".json not found or empty. Expected in ~/, ~/Configs/, ~/Configurations/, or as a section in appsettings.json.");
+                {
+                    var ex = FrameworkLog.Critical(type.Name + ".json not found or empty. Expected in ~/, ~/Configs/, ~/Configurations/, or as a section in appsettings.json.");
+                    throw ex;
+                }
+                    
 
                 try
                 {

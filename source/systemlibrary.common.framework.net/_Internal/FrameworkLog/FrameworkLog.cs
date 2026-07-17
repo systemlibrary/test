@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SystemLibrary.Common.Framework;
 
@@ -8,9 +9,30 @@ internal static class FrameworkLog
 
     static volatile bool IsFlushed = false;
 
-    internal static void Critical(string message)
+    internal static Exception Critical(object message)
     {
-        Add(LogLevel.Critical, message);
+        try
+        {
+            Console.Error.WriteLine(message);
+        }
+        catch
+        {
+            // swallow
+        }
+
+        try
+        {
+            Add(LogLevel.Critical, message?.ToString());
+        }
+        catch
+        {
+            // swallow
+        }
+
+        if (message is Exception ex)
+            return ex;
+
+        return new Exception(message?.ToString() ?? "");
     }
 
     internal static void Error(string message)

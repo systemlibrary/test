@@ -16,16 +16,6 @@ public static class LogFormatter
         Options.MaxLevel = 5;
         
         Options.Format = LogInstance.Format.ToEnum<ObjectFormatterFormat>();
-
-        if (EnvironmentInstance.IsDev)
-        {
-            Options.MemberOrder =
-            [
-                nameof(LogMessage.Level),
-                nameof(LogMessage.Timestamp)
-            ];
-        }
-
         //Framework.Debug("Unsupported format in systemLibraryCommonFramework:log:format, fallback to plain text");
     }
 

@@ -261,4 +261,26 @@ public static partial class StringBuilderExtensions
 
         return stringBuilder;
     }
+
+    internal static void AppendAnsiColor(this StringBuilder sb, string color)
+    {
+        if (sb.Length == 0) return;
+
+        var end = sb.Length;
+
+        for (var i = 0; i < end; i++)
+        {
+            var c = sb[i];
+
+            if (c == ':' || c == '\n')
+            {
+                end = i;
+                break;
+            }
+        }
+
+        sb.Insert(0, color);
+
+        sb.Insert(end + color.Length, AnsiColor.End);
+    }
 }
