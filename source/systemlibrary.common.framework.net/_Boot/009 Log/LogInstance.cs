@@ -4,7 +4,7 @@ namespace SystemLibrary.Common.Framework.Boostrap;
 
 internal static class LogInstance
 {
-    internal static string FullFilePath;
+    internal static string FilePath;
     internal static LogFormat Format;
     internal static LogType LogType;
     internal static StdForward StdForward;

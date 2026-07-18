@@ -6,11 +6,13 @@ internal static class Base62Boot
 
     static Base62Boot()
     {
-        // We do not start with digits to obfuscate output
+        // Prevents common ASCII characters from mapping to themselves by starting with capital letters instead of digits
         var base62_order = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".ToArray();
 
-        var map = new char[383];
+        int latin_extended_a_max = 383;
+        var map = new char[latin_extended_a_max];
 
+        // Map ASCII properly, and keep reusing Index for remaining char conversions
         var index = 0;
         for (int i = 0; i < map.Length; i++)
             map[i] = '?';
@@ -35,7 +37,7 @@ internal static class Base62Boot
         }
 
         Base62Instance.Base62 = base62_order;
-        Base62Instance.Base62Map = map;
+        Base62Instance.Base62CharacterMap = map;
     }
 }
 

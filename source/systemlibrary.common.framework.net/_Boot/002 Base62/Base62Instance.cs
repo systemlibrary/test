@@ -3,10 +3,11 @@
 internal static class Base62Instance
 {
     /// <summary>
-    /// Only to be used in char extensions
-    /// Converting a char to base62 char through a pre-mapped array for chars < 383
+    /// Precomputed character mapping used only in char-extensions.
+    /// Maps UTF-16 characters to the Base62 alphabet for fast conversion.
+    /// This is not encoding and cannot be reversed.
     /// </summary>
-    internal static char[] Base62Map;
+    internal static char[] Base62CharacterMap;
 
     /// <summary>
     /// Use this always for (number % 62) calculations

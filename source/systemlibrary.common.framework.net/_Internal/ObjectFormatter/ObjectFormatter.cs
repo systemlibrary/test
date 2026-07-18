@@ -30,9 +30,10 @@ internal static class ObjectFormatter
         if (!InvalidFormatErrorLogged)
         {
             InvalidFormatErrorLogged = true;
+
             var supported = EnumExtensions<ObjectFormatterFormat>.GetKeys();
 
-            FrameworkLog.Error("Format " + ((int)format) + " is not supported. " + string.Join(", ", supported));
+            FrameworkLog.Error("Format " + ((int)format) + " is not supported. Uses fallback. Supported ones are: " + string.Join(", ", supported));
         }
 
         return ObjectPlainTextFormatter.Format(message, options);

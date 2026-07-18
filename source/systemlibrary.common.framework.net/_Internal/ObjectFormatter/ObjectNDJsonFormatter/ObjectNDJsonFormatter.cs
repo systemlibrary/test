@@ -77,10 +77,11 @@ internal static class ObjectNDJsonFormatter
         JsonOptions.Converters.Add(JsonStringEnumConverter);
     }
 
+    // NOTE: Optimize, should support 'streams' instead of passing string into a stringbuilder somehow, to further adjust the stringbuilder and return the string, and with special "date converter"... to ignore time timestamp if 'Dump' is log level
     internal static StringBuilder Format(object obj, ObjectFormatterOptions options)
     {
-        if (obj is string msg) return new StringBuilder("{\n\t\"message\" : " + JsonSerializer.Serialize(msg, JsonOptions) + "\n}");
-
+        // Currently obj is always a LogMessage
+        //if (obj is string msg) return new StringBuilder("{\n\t\"message\" : " + JsonSerializer.Serialize(msg, JsonOptions) + "\n}");
         return new StringBuilder(System.Text.Json.JsonSerializer.Serialize(obj, JsonOptions));
     }
 }

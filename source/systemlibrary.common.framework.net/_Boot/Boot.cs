@@ -1,6 +1,4 @@
-﻿using System.Runtime.Loader;
-
-namespace SystemLibrary.Common.Framework.Boostrap;
+﻿namespace SystemLibrary.Common.Framework.Boostrap;
 
 internal partial class Boot
 {
@@ -32,7 +30,7 @@ internal partial class Boot
     {
         try
         {
-            RegisterShutdownEvent();
+            OnShutdownBoot.Strap();
 
             ThreadPoolBoot.Strap();
 
@@ -78,11 +76,5 @@ internal partial class Boot
 
             throw;
         }
-    }
-
-    static void RegisterShutdownEvent()
-    {
-        AssemblyLoadContext.Default.Unloading += _ => LogFlusher.ShutdownFlush();
-        AppDomain.CurrentDomain.DomainUnload += (s, e) => LogFlusher.ShutdownFlush();
     }
 }

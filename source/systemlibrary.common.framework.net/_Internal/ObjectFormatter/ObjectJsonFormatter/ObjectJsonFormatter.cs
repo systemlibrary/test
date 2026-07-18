@@ -79,8 +79,6 @@ internal static class ObjectJsonFormatter
 
     internal static StringBuilder Format(object obj, ObjectFormatterOptions options)
     {
-        if (obj is string msg) return new StringBuilder("{\n\t\"message\" : " + JsonSerializer.Serialize(msg, JsonOptions) + "\n}");
-
         return new StringBuilder(System.Text.Json.JsonSerializer.Serialize(obj, JsonOptions));
     }
 }

@@ -10,7 +10,7 @@ internal class FileLogWriter : ILogWriter
     static Timer Interval = new Timer(SafeWriteQueue, null, IntervalTimeMs, Timeout.Infinite);
     static ConcurrentQueue<LogMessage> Queue = new();
 
-    const int IntervalTimeMs = 10;
+    const int IntervalTimeMs = 6;
 
     const long MaxLogSizeBytes = 25 * 1024 * 1024;
 
@@ -52,11 +52,11 @@ internal class FileLogWriter : ILogWriter
             TruncateCounter = TruncateCounter - 250;
             try
             {
-                FileInfo logFile = new(LogInstance.FullFilePath);
+                FileInfo logFile = new(LogInstance.FilePath);
 
                 if (logFile.Exists && logFile.Length >= MaxLogSizeBytes)
                 {
-                    File.WriteAllText(LogInstance.FullFilePath, string.Empty);
+                    File.WriteAllText(LogInstance.FilePath, string.Empty);
                 }
             }
             catch
@@ -79,6 +79,7 @@ internal class FileLogWriter : ILogWriter
 
                 batch.Append(text);
                 batch.AppendLine();
+                batch.AppendLine();
 
                 max--;
                 if (max < 0)
@@ -86,7 +87,7 @@ internal class FileLogWriter : ILogWriter
             }
 
             if (batch.Length > 0)
-                File.AppendAllText(LogInstance.FullFilePath, batch.ToString(), Encoding.UTF8);
+                File.AppendAllText(LogInstance.FilePath, batch.ToString(), Encoding.UTF8);
 
             batch.Clear();
         }
@@ -97,7 +98,7 @@ internal class FileLogWriter : ILogWriter
             try
             {
                 if (batch.Length > 0)
-                    File.AppendAllText(LogInstance.FullFilePath, batch.ToString(), Encoding.UTF8);
+                    File.AppendAllText(LogInstance.FilePath, batch.ToString(), Encoding.UTF8);
             }
             catch
             {

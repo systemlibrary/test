@@ -26,7 +26,7 @@ internal class LogQueue
     static LogQueue()
     {
         Queue = new();
-        Timer = new Timer(LogFlusher.Flush, null, Interval / 3, Timeout.Infinite);
+        Timer = new Timer(LogFlusher.Flush, null, Interval/4, Timeout.Infinite);
         TimerLock = new object();
 
         var overflowText = $"[Log] overflow, log queue discarded due to threshold of {MaxQueuePerInterval} messages reached within {Interval}ms.\n";

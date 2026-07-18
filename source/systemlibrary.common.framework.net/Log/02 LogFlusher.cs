@@ -38,18 +38,6 @@ internal class LogFlusher
         }
     }
 
-    static int Shutdown;
-
-    internal static void ShutdownFlush()
-    {
-        if (Interlocked.Exchange(ref Shutdown, 1) == 1)
-            return;
-
-        Dequeue();
-
-        Thread.Sleep(66);
-    }
-
     internal static void Flush(object state = null)
     {
         try
@@ -67,7 +55,7 @@ internal class LogFlusher
             LogQueue.StartTimer();
     }
 
-    static void Dequeue()
+    static bool Dequeue()
     {
         var queue = LogQueue.Queue;
 
@@ -82,5 +70,12 @@ internal class LogFlusher
             if (processed >= LogQueue.MaxQueuePerInterval + 10)
                 break;
         }
+
+        return processed > 0;
+    }
+
+    internal static bool ForceFlush()
+    {
+        return Dequeue();
     }
 }

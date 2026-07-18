@@ -8,7 +8,7 @@ static class LogBoot
     {
         var settings = FrameworkSettingsInstance.Current.Log;
 
-        LogInstance.FullFilePath = settings.FullFilePath._ToOsFriendlyPath();
+        LogInstance.FilePath = settings.FilePath._ToOsFriendlyPath();
 
         LogInstance.MinLogLevel = GetMinLogLevel(settings.Level);
 
@@ -16,16 +16,25 @@ static class LogBoot
 
         LogInstance.Format = settings.Format;
         LogInstance.StdForward = settings.StdForward;
-        LogInstance.LogType = settings.LogForward;
+        LogInstance.LogType = settings.LogType;
 
         InitializeLogFilePath();
     }
 
     static void InitializeLogFilePath()
     {
-        var path = LogInstance.FullFilePath;
+        var path = LogInstance.FilePath;
 
-        if (path.IsNot()) return;
+        if (path.IsNot())
+        {
+            if(LogInstance.LogType == LogType.File)
+            {
+                var ex = FrameworkLog.Critical("Log file path is empty, but youve configured logtype to be file, please also specify 'log:filePath'");
+
+                throw ex;
+            }
+            return;
+        }
 
         var folder = Path.GetDirectoryName(path);
 
@@ -36,7 +45,7 @@ static class LogBoot
         }
         catch (Exception ex)
         {
-            FrameworkLog.Error("Log directory was not created: " + ex.Message + ". FullFilePath: " + LogInstance.FullFilePath);
+            FrameworkLog.Error("Log directory was not created: " + ex.Message + ". FullFilePath: " + LogInstance.FilePath);
             //BootstrapLog.Error(Directory could not be created: " + ex.Message);
         }
     }

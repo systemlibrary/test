@@ -67,7 +67,6 @@ internal static class FrameworkLog
         else
             Write(level, message);
     }
-
    
     internal static void Flush()
     {
