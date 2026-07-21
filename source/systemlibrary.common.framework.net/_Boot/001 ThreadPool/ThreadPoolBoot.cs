@@ -8,6 +8,10 @@ internal static class ThreadPoolBoot
     {
         var cpu = Environment.ProcessorCount;
 
-        ThreadPool.SetMinThreads(cpu * 2, Math.Max(1, cpu / 2));
+        ThreadPool.GetMinThreads(out var workers, out var io);
+
+        ThreadPool.SetMinThreads(
+            Math.Max(workers, Math.Max(2, cpu)),
+            Math.Max(io, Math.Max(2, cpu / 2)));
     }
 }

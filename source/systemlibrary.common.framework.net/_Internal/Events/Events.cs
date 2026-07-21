@@ -2,13 +2,13 @@
 
 internal static class Events
 {
-    static int HasRan;
+    static int IsShuttingDown;
 
     public static event Action Shutdown;
     
     internal static void OnShutdownEvent()
     {
-        if (Interlocked.Exchange(ref HasRan, 1) != 0) return;
+        if (Interlocked.Exchange(ref IsShuttingDown, 1) != 0) return;
 
         var handlers = Shutdown;
         if (handlers != null)
