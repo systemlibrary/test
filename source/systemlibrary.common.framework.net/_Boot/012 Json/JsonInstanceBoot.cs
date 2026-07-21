@@ -18,3 +18,4 @@ static class JsonBoot
         JsonInstance.WriteIndented = settings.WriteIndented;
     }
 }
+

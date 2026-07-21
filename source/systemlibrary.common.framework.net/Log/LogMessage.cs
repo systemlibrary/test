@@ -48,7 +48,6 @@ public class LogMessage
     [Display(Order = 999)]
     public StackTrace StackTrace;
 
-
     public LogMessage(LogLevel level, object[] messages)
     {
         Timestamp = DateTimeOffset.UtcNow;

@@ -4,7 +4,7 @@ partial class CryptographyBoot
 {
     static void TryAppendKeyFromEnvironmentVariable(List<KeyData> keys)
     {
-        var key = EnvironmentInstance.GetEnvironmentVariable("SLCF_ENCRYPTION_KEY");
+        var key = EnvironmentVariable.Get("SLCF_ENCRYPTION_KEY");
 
         if (key.Is())
         {
@@ -14,7 +14,7 @@ partial class CryptographyBoot
     }
     static string TryGetKeyFromEnvironmentVariable()
     {
-        var key = EnvironmentInstance.GetEnvironmentVariable("SLCF_ENCRYPTION_KEY");
+        var key = EnvironmentVariable.Get("SLCF_ENCRYPTION_KEY");
 
         if (key.Is())
         {

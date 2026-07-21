@@ -18,10 +18,10 @@ internal static class AppBoot
 
     internal static string HostName()
     {
-        var hostName = EnvironmentInstance.GetEnvironmentVariable("WEBSITE_HOSTNAME");
+        var hostName = EnvironmentVariable.Get("WEBSITE_HOSTNAME");
 
         if (hostName.IsNot())
-            hostName = EnvironmentInstance.GetEnvironmentVariable("ASPNETCORE_PRIMARYDOMAIN") ?? "";
+            hostName = EnvironmentVariable.Get("ASPNETCORE_PRIMARYDOMAIN") ?? "";
 
         if (hostName.Is())
         {

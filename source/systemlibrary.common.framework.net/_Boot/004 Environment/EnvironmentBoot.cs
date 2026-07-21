@@ -56,7 +56,7 @@ static class EnvironmentBoot
         {
             try
             {
-                name = EnvironmentInstance.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+                name = EnvironmentVariable.Get("ASPNETCORE_ENVIRONMENT");
             }
             catch (Exception ex)
             {
@@ -68,7 +68,7 @@ static class EnvironmentBoot
         {
             try
             {
-                name = EnvironmentInstance.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+                name = EnvironmentVariable.Get("DOTNET_ENVIRONMENT");
             }
             catch (Exception ex)
             {
@@ -88,4 +88,5 @@ static class EnvironmentBoot
     {
         return env == Framework.EnvironmentType.Prod || env == Framework.EnvironmentType.Production;
     }
+
 }

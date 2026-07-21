@@ -367,7 +367,7 @@ internal static class ObjectPlainTextFormatter
 
         if (!type.IsClassType()) return false;
 
-        if (ObjectFormatterBlacklist.ClassNames.Contains(type.Name)) return true;
+        if (JsonPropertyBlacklist.ClassNames.Contains(type.Name)) return true;
 
         var reference = RuntimeHelpers.GetHashCode(obj);
 
@@ -382,8 +382,8 @@ internal static class ObjectPlainTextFormatter
         {
             return type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetProperty).Where(p =>
                     p.CanRead &&
-                    !ObjectFormatterBlacklist.MemberNames.Contains(p.Name) &&
-                    !ObjectFormatterBlacklist.ClassNames.Contains(p.PropertyType.Name) &&
+                    !JsonPropertyBlacklist.MemberNames.Contains(p.Name) &&
+                    !JsonPropertyBlacklist.ClassNames.Contains(p.PropertyType.Name) &&
                     (p.GetCustomAttribute<BrowsableAttribute>()?.Browsable ?? true)
                 )
                 .OrderBy(p =>
@@ -400,8 +400,8 @@ internal static class ObjectPlainTextFormatter
         var fields = TypeFields.Cache(type, () =>
         {
             return type.GetFields(BindingFlags.Public | BindingFlags.Instance).Where(f =>
-                    !ObjectFormatterBlacklist.MemberNames.Contains(f.Name) &&
-                    !ObjectFormatterBlacklist.ClassNames.Contains(f.FieldType.Name) &&
+                    !JsonPropertyBlacklist.MemberNames.Contains(f.Name) &&
+                    !JsonPropertyBlacklist.ClassNames.Contains(f.FieldType.Name) &&
                     (f.GetCustomAttribute<BrowsableAttribute>()?.Browsable ?? true)
                 )
                 .OrderBy(p =>
@@ -461,7 +461,7 @@ internal static class ObjectPlainTextFormatter
 
                     var sb = new StringBuilder(128);
 
-                    if (value is string text && ObjectFormatterObfuscate.MemberNames.Contains(property.Name))
+                    if (value is string text && JsonPropertyObfuscate.MemberNames.Contains(property.Name))
                     {
                         Append(sb, text.Obfuscate(), level, visited, options);
                     }
@@ -520,7 +520,7 @@ internal static class ObjectPlainTextFormatter
                     Add(message, field.Name + ": ", level - 1);
                     //}
 
-                    if (value is string text && ObjectFormatterObfuscate.MemberNames.Contains(field.Name))
+                    if (value is string text && JsonPropertyObfuscate.MemberNames.Contains(field.Name))
                     {
                         Append(sb, text.Obfuscate(), level, visited, options);
                     }
