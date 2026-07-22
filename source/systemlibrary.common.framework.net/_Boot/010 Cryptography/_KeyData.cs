@@ -6,9 +6,9 @@ internal class KeyData
     public string KeyStart;
     public byte[] KeyStartBytes;
     public byte[] Key;
-    public string Path;
+    public string FilePath;
 
-    internal static KeyData Create(string source, string key, string path)
+    internal static KeyData Create(string source, string key, string filePath)
     {
         if (key != null)
             key = "#<" + key + "?(Ø^";
@@ -23,7 +23,7 @@ internal class KeyData
             KeyStart = key.MaxLength(3),
             Key = bytes,
             KeyStartBytes = key.MaxLength(3).GetBytes(),
-            Path = path
+            FilePath = filePath
         };
     }
 }

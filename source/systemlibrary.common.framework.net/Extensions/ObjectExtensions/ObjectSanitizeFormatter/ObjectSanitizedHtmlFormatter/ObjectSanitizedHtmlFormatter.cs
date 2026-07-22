@@ -4,26 +4,18 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Globalization;
+using System.Net;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
-
-using SystemLibrary.Common.Framework.Boostrap;
 
 namespace SystemLibrary.Common.Framework.Extensions;
 
-/// <summary>
-/// TODO: Total refactor, restructure into proper methods and reusable methods, and lists of configurations that makes this extensible
-/// Fix: Maximum amount of 'message.Len' to be, say, 1024K chars.
-/// Fix: Maximum amount of printed items in IEnumerables per IEnumerable to be 128K.
-/// </summary>
-internal static class ObjectPlainTextFormatter
+internal static class ObjectSanitizedHtmlFormatter
 {
     internal static ConcurrentDictionary<int, PropertyInfo[]> TypeProperties = new ConcurrentDictionary<int, PropertyInfo[]>();
     internal static ConcurrentDictionary<int, FieldInfo[]> TypeFields = new ConcurrentDictionary<int, FieldInfo[]>();
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static StringBuilder Format(object obj, ObjectFormatterOptions options)
+    internal static StringBuilder Format(object obj, ObjectSanitizedFormatOptions options)
     {
         var message = new StringBuilder(224);
 
@@ -33,17 +25,20 @@ internal static class ObjectPlainTextFormatter
 
         Append(message, obj, level, visited, options);
 
+        message.TrimStart("<br>");
+
+        message.Insert(0, "<div style='margin-bottom:0.5em; padding:0.2em 0 0.5em; border-bottom:1px solid #a39e9e;'>");
+
+        message.Append("</div>");
+
         visited.Clear();
 
         visited = null;
 
-        if (message.EndsWith("\n"))
-            message.TrimEnd();
-
         return message;
     }
 
-    static void Append(StringBuilder message, object obj, int level, List<int> visited, ObjectFormatterOptions options)
+    static void Append(StringBuilder message, object obj, int level, List<int> visited, ObjectSanitizedFormatOptions options)
     {
         if (AppendVariable(message, obj, level, options)) return;
 
@@ -64,7 +59,7 @@ internal static class ObjectPlainTextFormatter
         Add(message, obj.ToString(), level);
     }
 
-    static bool AppendVariable(StringBuilder message, object obj, int level, ObjectFormatterOptions options)
+    static bool AppendVariable(StringBuilder message, object obj, int level, ObjectSanitizedFormatOptions options)
     {
         var value = GetVariableValue(obj);
 
@@ -79,6 +74,7 @@ internal static class ObjectPlainTextFormatter
             }
 
             Add(message, value, level);
+
             return true;
         }
         return false;
@@ -142,7 +138,7 @@ internal static class ObjectPlainTextFormatter
         return false;
     }
 
-    static bool AppendKeyValuePair(StringBuilder message, object obj, int level, List<int> visited, ObjectFormatterOptions options)
+    static bool AppendKeyValuePair(StringBuilder message, object obj, int level, List<int> visited, ObjectSanitizedFormatOptions options)
     {
         var objType = obj.GetType();
         if (objType.IsGenericType &&
@@ -173,8 +169,9 @@ internal static class ObjectPlainTextFormatter
                 else if (value is IDictionary dictionary)
                 {
                     // TODO: Create a decent way to print any dictionary (nested dictionary, etc)
-                    var ident = new string('\t', level);
-                    var joined = "{\n" + ident;
+                    var ident = CreateTabs(level);
+
+                    var joined = "{<br>" + ident;
                     foreach (var dk in dictionary.Keys)
                     {
                         joined += dk + ": ";
@@ -187,7 +184,7 @@ internal static class ObjectPlainTextFormatter
 
                             joined += sb.ToString();
                         }
-                        joined += "\n" + ident;
+                        joined += "<br>" + ident;
                     }
                     Add(message, "[" + key + ", " + joined + "}]", level);
                 }
@@ -208,7 +205,7 @@ internal static class ObjectPlainTextFormatter
         return false;
     }
 
-    static bool AppendEnumerable(StringBuilder message, object obj, int level, List<int> visited, ObjectFormatterOptions options)
+    static bool AppendEnumerable(StringBuilder message, object obj, int level, List<int> visited, ObjectSanitizedFormatOptions options)
     {
         var isList = obj is IEnumerable && obj is not string;
 
@@ -265,7 +262,7 @@ internal static class ObjectPlainTextFormatter
             {
                 var arr = enumerable as Array;
 
-                message.Append("\n" + new string('\t', level + 1));
+                message.Append("<br>" + CreateTabs(level + 1));
 
                 for (int j = 0; j < arr.GetLength(0); j++)
                 {
@@ -276,12 +273,12 @@ internal static class ObjectPlainTextFormatter
                     }
 
                     if (j + 1 < arr.GetLength(0))
-                        message.Append("\n" + new string('\t', level + 1));
+                        message.Append("<br>" + CreateTabs(level + 1));
                 }
             }
             else
             {
-                Add(message, "\n", level);
+                Add(message, "<br>", level);
                 int curr = 1;
 
                 foreach (var item in enumerable)
@@ -299,7 +296,7 @@ internal static class ObjectPlainTextFormatter
                     {
                         curr++;
                         Add(message, tmp.ToString(), 0);
-                        Add(message, "\n", level + 1);
+                        Add(message, "<br>", level + 1);
                     }
                     else
                     {
@@ -314,11 +311,9 @@ internal static class ObjectPlainTextFormatter
 
     static void AppendEnumerableTypeName(StringBuilder message, IEnumerable enumerable, int level, Type type, Type type2, Type[] args, int count)
     {
-        // Enumearble types of Object, we do not print that as a prefix
-        if (type == SystemType.ObjectType) return;
-
         if (args == null || args.Length == 0)
             Add(message, PrintTypeName(type) + "[] (" + count + ")", level);
+
         else
         {
             if (enumerable is IDictionary)
@@ -362,19 +357,20 @@ internal static class ObjectPlainTextFormatter
         return type.Name;
     }
 
-    static bool AppendClass(StringBuilder message, object obj, int level, List<int> visited, ObjectFormatterOptions options)
+    static bool AppendClass(StringBuilder message, object obj, int level, List<int> visited, ObjectSanitizedFormatOptions options)
     {
         var type = obj.GetType();
 
         if (!type.IsClassType()) return false;
 
-        if (NamesBlacklisted.ClassNames.Contains(type.Name)) return true;
+        if (ObjectSanitizedBlacklist.ClassNames.Contains(type.Name)) return true;
 
-        var reference = RuntimeHelpers.GetHashCode(obj);
+        var reference = obj.GetHashCode();
 
+        level = level - 1;
         if (IsVisited(type, reference, visited))
         {
-            Add(message, obj.GetType().Name + " ref: " + reference + " already printed, continue...", level);
+            Add(message, obj.GetType().Name + " ref: " + (obj.GetHashCode()) + " already printed, continue...", level);
 
             return true;
         }
@@ -383,36 +379,22 @@ internal static class ObjectPlainTextFormatter
         {
             return type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetProperty).Where(p =>
                     p.CanRead &&
-                    !NamesBlacklisted.MemberNames.Contains(p.Name) &&
-                    !NamesBlacklisted.ClassNames.Contains(p.PropertyType.Name) &&
+                    !ObjectSanitizedBlacklist.MemberNames.Contains(p.Name) &&
+                    !ObjectSanitizedBlacklist.ClassNames.Contains(p.PropertyType.Name) &&
                     (p.GetCustomAttribute<BrowsableAttribute>()?.Browsable ?? true)
                 )
-                .OrderBy(p =>
-                {
-                    var index = FormatInstance.ObjectTextFormatterMemberOrder?.IndexOf(p.Name) ?? -1;
-
-                    if (index >= 0) return index;
-
-                    return 1000 + (p.GetCustomAttribute<DisplayAttribute>()?.GetOrder() ?? int.MaxValue);
-                })
+                .OrderBy(p => p.GetCustomAttribute<DisplayAttribute>()?.GetOrder() ?? int.MaxValue)
                 .ToArray();
         });
 
         var fields = TypeFields.Cache(type, () =>
         {
             return type.GetFields(BindingFlags.Public | BindingFlags.Instance).Where(f =>
-                    !NamesBlacklisted.MemberNames.Contains(f.Name) &&
-                    !NamesBlacklisted.ClassNames.Contains(f.FieldType.Name) &&
+                    !ObjectSanitizedBlacklist.MemberNames.Contains(f.Name) &&
+                    !ObjectSanitizedBlacklist.ClassNames.Contains(f.FieldType.Name) &&
                     (f.GetCustomAttribute<BrowsableAttribute>()?.Browsable ?? true)
                 )
-                .OrderBy(p =>
-                {
-                    var index = FormatInstance.ObjectTextFormatterMemberOrder?.IndexOf(p.Name) ?? -1;
-
-                    if (index >= 0) return index;
-
-                    return 1000 + (p.GetCustomAttribute<DisplayAttribute>()?.GetOrder() ?? int.MaxValue);
-                })
+                .OrderBy(f => f.GetCustomAttribute<DisplayAttribute>()?.GetOrder() ?? int.MaxValue)
                 .ToArray();
         });
 
@@ -431,8 +413,7 @@ internal static class ObjectPlainTextFormatter
         if (level > 0)
             Add(message, typeName + " (ref: " + reference + ")", level);
 
-        if (message.Length > 0)
-            Add(message, "\n", 0);
+        Add(message, "<br>", 0);
 
         level += 1;
 
@@ -458,11 +439,11 @@ internal static class ObjectPlainTextFormatter
 
                     if (options.ExcludeNullMembers && value == null) continue;
 
-                    Add(message, property.Name + ": ", level - 1);
+                    Add(message, property.Name + ": ", level);
 
                     var sb = new StringBuilder(128);
 
-                    if (value is string text && NamesObfuscated.MemberNames.Contains(property.Name))
+                    if (value is string text && ObjectSanitizedObfuscate.MemberNames.Contains(property.Name.ToLower()))
                     {
                         Append(sb, text.Obfuscate(), level, visited, options);
                     }
@@ -471,10 +452,9 @@ internal static class ObjectPlainTextFormatter
                         Append(sb, value, level, visited, options);
                     }
 
-                    // NOTE: Cannot remember what this was good for again
-                    //int index = level;
-                    //if (index > 0 && sb.Length > index)
-                    //    sb.Remove(0, index);
+                    int index = level;
+                    if (index > 0 && sb.Length > index)
+                        sb.Remove(0, index);
 
                     Add(message, sb.ToString(), 0);
                 }
@@ -486,14 +466,14 @@ internal static class ObjectPlainTextFormatter
                     Add(message, "(error reading property, continue...)", level);
                 }
                 if (i < properties.Length - 1)
-                    Add(message, "\n", 0);
+                    Add(message, "<br>", 0);
             }
         }
 
         if (fields.Any())
         {
             if (properties.Any())
-                Add(message, "\n", 0);
+                Add(message, "<br>", 0);
 
             for (int i = 0; i < fields.Length; i++)
             {
@@ -511,17 +491,9 @@ internal static class ObjectPlainTextFormatter
 
                     var sb = new StringBuilder(128);
 
-                    //if (field.Name[0] == 'M' &&
-                    //   type.Name == "LogMessage" &&
-                    //   (field.Name == "Messages" || field.Name == "Message"))
-                    //{
-                    //}
-                    //else
-                    //{
-                    Add(message, field.Name + ": ", level - 1);
-                    //}
+                    Add(message, field.Name + ": ", level);
 
-                    if (value is string text && NamesObfuscated.MemberNames.Contains(field.Name))
+                    if (value is string text && ObjectSanitizedObfuscate.MemberNames.Contains(field.Name.ToLower()))
                     {
                         Append(sb, text.Obfuscate(), level, visited, options);
                     }
@@ -532,7 +504,7 @@ internal static class ObjectPlainTextFormatter
 
                     int index = level;
                     if (index > 0)
-                        sb.TrimStart();
+                        sb.Remove(0, index);
 
                     Add(message, sb.ToString(), 0);
                 }
@@ -544,7 +516,7 @@ internal static class ObjectPlainTextFormatter
                     Add(message, "(error reading field, continue...)", level);
                 }
                 if (i < fields.Length - 1)
-                    Add(message, "\n", 0);
+                    Add(message, "<br>", 0);
             }
         }
         return true;
@@ -558,11 +530,8 @@ internal static class ObjectPlainTextFormatter
 
     static void Add(StringBuilder message, string value, int level)
     {
-        if (message.Length != 0)
-            message.Append(new string(' ', level * 2));
-
-        if (value != null)
-            message.Append(value);
+        message.Append(CreateTabs(level));
+        message.Append(value);
     }
 
     static bool IsVisited(Type type, int hash, List<int> visit)
@@ -627,19 +596,42 @@ internal static class ObjectPlainTextFormatter
         {
             if (e is AggregateException agg)
             {
-                return agg.Flatten().ToString().Replace("\n", "\n\t");
+                return agg.Flatten().ToString().Replace("<br>", "<br>&nbsp;&nbsp;&nbsp;&nbsp;");
             }
-            return e.ToString().Replace("\n", "\n\t");
+            return e.ToString().Replace("<br>", "<br>&nbsp;&nbsp;&nbsp;&nbsp;");
         }
 
         if (obj is string str)
-            return PrintString(str);
+        {
+            if (str == "") return "(empty)";
 
-        if (obj is StringBuilder sb) return PrintString(sb.ToString());
+            var strLength = str.Length;
+            if (strLength > 16384)
+            {
+                var lastWords = new StringBuilder();
+                int spaceCount = 0;
 
-        if (obj is DateTime dt) return dt.ToString(FormatInstance.IsoDateTimeFormat);
+                for (int i = strLength - 1; i >= 0 && spaceCount < 3; i--)
+                {
+                    if (str[i] == ' ') spaceCount++;
 
-        if (obj is DateTimeOffset dto) return dto.ToString(FormatInstance.IsoDateTimeOffsetFormat);
+                    lastWords.Insert(0, str[i]);
+
+                    if (lastWords.Length > 192) break;
+                }
+
+                var l = 16192 + 4 + lastWords.Length;
+
+                return WebUtility.HtmlEncode($"{str.Substring(0, 16192)}...{lastWords} (length: {l}/{strLength})");
+            }
+            return WebUtility.HtmlEncode(strLength > 32 ? $"{str} (length: {strLength})" : str);
+        }
+
+        if (obj is StringBuilder sb) return WebUtility.HtmlEncode(sb.ToString());
+
+        if (obj is DateTime dt) return dt.ToString("yyyy-MM-dd HH:mm:ss.fffzzz");
+
+        if (obj is DateTimeOffset dto) return dto.ToString("yyyy-MM-dd HH:mm:ss.fffzzz");
 
         if (obj is Enum enu) return PrintEnum(enu);
 
@@ -768,7 +760,7 @@ internal static class ObjectPlainTextFormatter
         {
             if (objects.Length == 1 && objects[0] is string txt)
             {
-                return PrintString(txt);
+                return txt;
             }
         }
 
@@ -779,36 +771,16 @@ internal static class ObjectPlainTextFormatter
     {
         var value = (item as Enum).ToValue();
 
-        var text = (item as Enum).ToText();
-        if (value.Is() && text != value)
-            return text + " (" + value + ")";
+        if (value.Is())
+            return (item as Enum).ToText() + " (" + value + ")";
 
         return (item as Enum).ToText();
     }
 
-    static string PrintString(string str)
+    static string CreateTabs(int level)
     {
-        if (str == "") return "(empty)";
+        var tabs = new string('\t', level);
 
-        var strLength = str.Length;
-        if (strLength > 16384)
-        {
-            var lastWords = new StringBuilder();
-            int spaceCount = 0;
-
-            for (int i = strLength - 1; i >= 0 && spaceCount < 3; i--)
-            {
-                if (str[i] == ' ') spaceCount++;
-
-                lastWords.Insert(0, str[i]);
-
-                if (lastWords.Length > 192) break;
-            }
-
-            var l = 16192 + 4 + lastWords.Length;
-
-            return $"{str.Substring(0, 16192)}...{lastWords} (length: {l}/{strLength})";
-        }
-        return strLength > 32 ? $"{str} (length: {strLength})" : str;
+        return tabs.Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
     }
 }

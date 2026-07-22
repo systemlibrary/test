@@ -1,4 +1,6 @@
-﻿using SystemLibrary.Common.Framework.Boostrap;
+﻿using System.Runtime.CompilerServices;
+
+using SystemLibrary.Common.Framework.Boostrap;
 
 namespace SystemLibrary.Common.Framework.Extensions;
 
@@ -6,6 +8,7 @@ internal static class ObjectFormatter
 {
     static bool InvalidFormatErrorLogged;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static string Format(object message, ObjectFormatterOptions options)
     {
         var format = options.Format;

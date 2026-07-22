@@ -8,6 +8,10 @@ internal static class AppConfigInstance
 
     internal static IDictionary<string, IConfigurationRoot> Configurations;
 
+    internal static string KeyVaultUrl;
+
+    internal static bool Debug;
+
     static AppConfigInstance()
     {
         Boot.Strap();

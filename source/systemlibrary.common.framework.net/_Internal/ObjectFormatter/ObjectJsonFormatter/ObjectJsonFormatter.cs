@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace SystemLibrary.Common.Framework.Extensions;
 
@@ -13,6 +14,7 @@ internal static class ObjectJsonFormatter
         jsonOptions = JsonSerializerOptionsFactory.Get(null, true, 5, true, true, NamesBlacklisted.MemberNames, NamesObfuscated.MemberNames, null);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static string Format(object obj, ObjectFormatterOptions options)
     {
         if (InitialRequest)

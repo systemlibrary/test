@@ -14,7 +14,7 @@ internal static class AppConfigKeyVault
 
     static AppConfigKeyVault()
     {
-        var keyVaultUrl = AppConfigVariables.KeyVaultUrl;
+        var keyVaultUrl = AppConfigInstance.KeyVaultUrl;
         if (keyVaultUrl.IsNot()) return;
         
         var options = new SecretClientOptions();
@@ -39,7 +39,7 @@ internal static class AppConfigKeyVault
 
     internal static void Add(ConfigurationBuilder builder, string fileName)
     {
-        if (AppConfigVariables.KeyVaultUrl.IsNot()) return;
+        if (AppConfigInstance.KeyVaultUrl.IsNot()) return;
 
         var fetched = Fetch(fileName);
 

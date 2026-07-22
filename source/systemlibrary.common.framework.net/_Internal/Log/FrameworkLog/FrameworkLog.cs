@@ -1,6 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
+using SystemLibrary.Common.Framework.Boostrap;
+
 namespace SystemLibrary.Common.Framework;
 
 internal static class FrameworkLog
@@ -48,7 +50,7 @@ internal static class FrameworkLog
     // Requires minimum Debug log level and that the Debug flag for the framework node in appsettings is set to true
     internal static void Debug(object message, object arg1 = null, object arg2 = null, object arg3 = null)
     {
-        if (!AppConfigVariables.Debug) return;
+        if (!AppConfigInstance.Debug) return;
 
         var args = new[] { arg1, arg2, arg3 }.Where(x => x != null).ToArray();
 

@@ -12,15 +12,4 @@ partial class CryptographyBoot
             // FrameworkLog.Debug("[Bootstrap.Encryption] Encryption key source: ENVVAR (" + key.MaxLength(3) + "...)");
         }
     }
-    static string TryGetKeyFromEnvironmentVariable()
-    {
-        var key = EnvironmentVariable.Get("SLCF_ENCRYPTION_KEY");
-
-        if (key.Is())
-        {
-            // FrameworkLog.Debug("[Bootstrap.Encryption] Encryption key source: ENVVAR (" + key.MaxLength(3) + "...)");
-        }
-
-        return key;
-    }
 }

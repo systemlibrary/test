@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-using SystemLibrary.Common.Framework.Extensions;
+﻿using SystemLibrary.Common.Framework.Extensions;
 
 namespace SystemLibrary.Common.Framework.Boostrap;
 
@@ -13,6 +11,20 @@ internal static partial class AppConfigBoot
         var configurationFiles = FindConfigurationFiles();
 
         AppConfigInstance.Configurations = AppConfigLoader.Load(configurationFiles);
+
+        var builder = AppConfigBuilder.CreateDefaultBuilder();
+
+        AppConfigBuilder.AppendJsonFile(builder, "appsettings", "json");
+
+        AppConfigBuilder.AddEnvironmentVariables(builder);
+
+        var temp = builder.Build();
+
+        AppConfigInstance.KeyVaultUrl = temp["systemLibraryCommonFramework:config:keyVaultUrl"];
+        //FrameworkLog.Debug($"'systemLibraryCommonFramework:config:keyVaultUrl' is configured: {keyVaultUrl.MaxLength(16)}.");
+
+        AppConfigInstance.Debug = temp["systemLibraryCommonFramework:app:debug"]?.ToLower() == "true";
+        //FrameworkLog.Debug($"'systemLibraryCommonFramework:app:debug' is true");
     }
 
     static string[] FindConfigurationFiles()

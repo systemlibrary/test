@@ -1,6 +1,4 @@
-﻿using SystemLibrary.Common.Framework.Boostrap;
-
-namespace SystemLibrary.Common.Framework.Extensions;
+﻿namespace SystemLibrary.Common.Framework.Extensions;
 
 partial class ByteArrayExtensions
 {
@@ -10,8 +8,7 @@ partial class ByteArrayExtensions
     /// </summary>
     public static byte[] Encrypt(this byte[] data)
     {
-        return null;
-        //return Encrypt(data, CryptographyInstance.Key, null);
+        return Encrypt(data, (byte[])null, null);
     }
 
     /// <summary>
@@ -22,8 +19,7 @@ partial class ByteArrayExtensions
     /// </remarks>
     public static byte[] Encrypt(this byte[] data, string key, string IV = null)
     {
-        return null;
-        //return Encrypt(data, key.GetBytes() ?? CryptographyInstance.Key, IV.GetBytes());
+        return Encrypt(data, key.GetBytes(), IV.GetBytes());
     }
 
     /// <summary>
@@ -40,8 +36,7 @@ partial class ByteArrayExtensions
         if (IV != null && IV.Length != 16)
             throw new Exception("IV must be a length of 16 bytes for AES.");
 
-        return null;
-        //return Cryptation.EncryptAesCbc(data, key ?? CryptographyInstance.Key, IV);
+        return Cryptation.EncryptAesCbc(data, key, IV);
     }
 
     /// <summary>

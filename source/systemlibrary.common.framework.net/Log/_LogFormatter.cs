@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 
 using SystemLibrary.Common.Framework.Boostrap;
@@ -18,6 +19,7 @@ internal static class LogFormatter
         FormatOptions.Format = LogInstance.Format.ToEnum<ObjectFormatterFormat>();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string Format(LogMessage message)
     {
         try
