@@ -1,4 +1,6 @@
-﻿using SystemLibrary.Common.Framework.Extensions;
+﻿using System.Text;
+
+using SystemLibrary.Common.Framework.Extensions;
 
 namespace SystemLibrary.Common.Framework;
 
@@ -10,29 +12,31 @@ internal class StdLogWriter : ILogWriter
 
         if (Log.SupportsAnsi)
         {
+            var sb = new StringBuilder(text);
             switch (message.Level)
             {
                 case LogLevel.Debug:
                 case LogLevel.Dump:
-                    text.AppendAnsiColor(AnsiColor.Cyan);
+                    sb.AppendAnsiColor(AnsiColor.Cyan);
                     break;
 
                 case LogLevel.Information:
-                    text.AppendAnsiColor(AnsiColor.Green);
+                    sb.AppendAnsiColor(AnsiColor.Green);
                     break;
 
                 case LogLevel.Warning:
-                    text.AppendAnsiColor(AnsiColor.Yellow);
+                    sb.AppendAnsiColor(AnsiColor.Yellow);
                     break;
 
                 case LogLevel.Error:
-                    text.AppendAnsiColor(AnsiColor.Red);
+                    sb.AppendAnsiColor(AnsiColor.Red);
                     break;
 
                 case LogLevel.Critical:
-                    text.AppendAnsiColor(AnsiColor.DarkRed);
+                    sb.AppendAnsiColor(AnsiColor.DarkRed);
                     break;
             }
+            text = sb.ToString();
         }
 
         if (message.Level > LogLevel.Warning)

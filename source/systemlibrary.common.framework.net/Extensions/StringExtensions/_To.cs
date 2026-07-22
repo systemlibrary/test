@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text;
 
 using SystemLibrary.Common.Framework.Attributes;
+using SystemLibrary.Common.Framework.Boostrap;
 using SystemLibrary.Common.Framework.Extensions;
 
 namespace SystemLibrary.Common.Framework;
@@ -180,89 +181,17 @@ partial class StringExtensions
         return sb.ToString();
     }
 
-
-
     static string[] excludedNamespaces = new[] {
-        "System.",
-        "Microsoft",
-        "Windows",
-        "MSBuild",
-        "Castle.",
-        "Owin",
-        "StructureMap",
-        "EntityFramework",
-        "EPiServer",
-        "Umbraco",
-        "Newtonsoft",
-        "Swashbuckle.",
-        "RestSharp.",
-        "GraphQL.",
-        "log4net.",
+        "System.Runtime",
+        "System.Threading",
+        "System.Reflection",
+        "Microsoft.",
+        "Windows.",
+        "MSBuild.",
         "MSTest.",
         "VSTest.",
-        "Serilog.",
-        "nlog",
-        "ElasticSearch",
-        "Remotion.",
-        "YamlDotNet",
-        "Antlr.",
-        "ClearScript",
-        "AWS",
-        "SharpZipLib",
-        "Azure.",
-        "NuGet.",
-        "Salesforce.",
-        "React.",
-        "moq",
-        "Moq",
-        "automapper",
-        "AutoMapper",
-        "Autofac",
-        "Dapper",
-        "testhost",
-        "netstandard",
-        "nunit.",
-        "xunit.",
-        "Polly.",
-        "runtime.win",
-        "FluentValidation.",
-        "FluentAssertions.",
-        "StackExchange.",
-        "AutoFixture.",
-        "Modernizr.",
-        "DocumentFormat.OpenXml",
-        "NLog.",
-        "IdentityModel.",
-        "coverlet.",
-        "MediatR.",
-        "StyleCop.",
-        "Hangfire.",
-        "Npgsql.",
-        "NSubstitute.",
-        "NJsonSchema.",
-        "SendGrid",
-        "Portable.BouncyCastle.",
-        "RabbitMQ.",
-        "SQLitePCLRaw.",
-        "CsvHelper.",
-        "Elasticsearch.",
-        "MongoDB.",
-        "WebGrease.",
-        "Google.",
-        "jQuery.",
-        "JetBrains.",
-        "NodaTime.",
-        "Selenium.",
-        "CommandLineParser.",
-        "WebActivatorEx.",
-        "MailKit.",
-        "protobuf-net.",
-        "Unity.",
-        "MySql.Data.",
-        "Xamarin.",
-        "NuGet.Packaging.",
-        "FluentEmail.",
-        "Grpc."
+        "testhost.",
+        "netstandard.",
     };
 
     static string GetNonNoiseFrameName(MethodBase m)
@@ -281,19 +210,24 @@ partial class StringExtensions
         return ns + "." + t.Name + "." + m.Name;
     }
 
+    const int MaxFriendlyStackFrames = 30;
 
     /// <summary>
     /// Returns a display-friendly stack trace filtered to remove framework and test runner noise.
     /// </summary>
     public static string ToFriendlyStackTrace(this StackTrace stackTrace)
     {
+        //return stackTrace.ToString();
+
         if (stackTrace == null) return null;
 
         var frames = stackTrace.GetFrames();
 
-        var sb = new StringBuilder(200);
+        var sb = new StringBuilder(300);
 
         var methodEnding = "()" + Environment.NewLine;
+
+        var writtenFrames = 0;
 
         for (int i = 0; i < frames.Length; i++)
         {
@@ -314,13 +248,35 @@ partial class StringExtensions
                 continue;
             }
 
-            if (i == 3)
-                sb.Append("at ");
-            else
+
+            if (sb.Length > 1)
+            {
                 sb.Append(" at ");
+            }
 
             sb.Append(name);
-            sb.Append(methodEnding);
+            sb.Append("()");
+
+            if (EnvironmentInstance.IsDev)
+            {
+                var file = frame.GetFileName();
+                var line = frame.GetFileLineNumber();
+
+                if (file != null && line > 0)
+                {
+                    sb.Append(" in ");
+                    sb.Append(file);
+                    sb.Append(":line ");
+                    sb.Append(line);
+                }
+            }
+
+            sb.AppendLine();
+
+            writtenFrames++;
+
+            if (writtenFrames > MaxFriendlyStackFrames)
+                break;
         }
 
         sb.TrimEnd(Environment.NewLine);
@@ -362,7 +318,7 @@ partial class StringExtensions
                 }
 
                 if (traces[i].StartsWithAny(
-                    "   at SystemLibrary.Common.Framework.LoggerMessageBuilder.",
+                    "   at SystemLibrary.Common.Framework.LogFormatter",
                     "   at LoggerRateLimiter.Flush",
                     "   at System.Environment.get_"))
                 {

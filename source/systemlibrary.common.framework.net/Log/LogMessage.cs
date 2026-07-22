@@ -25,7 +25,7 @@ public class LogMessage
     ];
 
     [Display(Order = 1)]
-    public DateTimeOffset Timestamp;
+    public DateTimeOffset? Timestamp;
 
     [Display(Order = 5)]
     public LogLevel Level;
@@ -50,7 +50,6 @@ public class LogMessage
 
     public LogMessage(LogLevel level, object[] messages)
     {
-        Timestamp = DateTimeOffset.UtcNow;
         Level = level;
         if (messages.Length == 1)
             Message = messages[0];
@@ -59,6 +58,8 @@ public class LogMessage
 
         if (level != LogLevel.Dump)
         {
+            Timestamp = DateTimeOffset.UtcNow;
+
             if (level >= LogLevel.Warning)
             {
                 var httpContext = ServiceProviderInstance.Current.GetService<IHttpContextAccessor>()?.HttpContext;

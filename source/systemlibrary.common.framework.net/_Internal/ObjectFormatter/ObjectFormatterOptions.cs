@@ -1,4 +1,6 @@
-﻿namespace SystemLibrary.Common.Framework.Extensions;
+﻿using System.Text.Json;
+
+namespace SystemLibrary.Common.Framework.Extensions;
 
 public class ObjectFormatterOptions
 {
@@ -19,4 +21,8 @@ public class ObjectFormatterOptions
     /// </summary>
     public ObjectFormatterFormat Format = ObjectFormatterFormat.Plain;
 
+    /// <summary>
+    /// CUstom json serializer options, pass null to use Framework Defaults
+    /// </summary>
+    public JsonSerializerOptions JsonSerializerOptions = null;
 }
