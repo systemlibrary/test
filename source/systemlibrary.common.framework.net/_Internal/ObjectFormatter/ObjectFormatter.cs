@@ -8,40 +8,32 @@ internal static class ObjectFormatter
 
     internal static string Format(object message, ObjectFormatterOptions options)
     {
-        try
+        var format = options.Format;
+
+        if (format == ObjectFormatterFormat.Json)
         {
-            var format = options.Format;
+            return ObjectJsonFormatter.Format(message, options);
+        }
 
-            if (format == ObjectFormatterFormat.Json)
-            {
-                return ObjectJsonFormatter.Format(message, options);
-            }
-
-            if (format == ObjectFormatterFormat.Plain)
-            {
-                return ObjectPlainTextFormatter.Format(message, options).ToString();
-            }
-
-            if (format == ObjectFormatterFormat.NDJson)
-            {
-                return ObjectNDJsonFormatter.Format(message, options);
-            }
-
-            if (!InvalidFormatErrorLogged)
-            {
-                InvalidFormatErrorLogged = true;
-
-                var supported = EnumExtensions<ObjectFormatterFormat>.GetKeys();
-
-                FrameworkLog.Error("Format " + ((int)format) + " is not supported. Uses fallback. Supported ones are: " + string.Join(", ", supported));
-            }
-
+        if (format == ObjectFormatterFormat.Plain)
+        {
             return ObjectPlainTextFormatter.Format(message, options).ToString();
         }
-        catch(Exception ex)
+
+        if (format == ObjectFormatterFormat.NDJson)
         {
-            BootstrapLog.Write("Error: " + ex);
-            return ex.Message;
+            return ObjectNDJsonFormatter.Format(message, options);
         }
+
+        if (!InvalidFormatErrorLogged)
+        {
+            InvalidFormatErrorLogged = true;
+
+            var supported = EnumExtensions<ObjectFormatterFormat>.GetKeys();
+
+            FrameworkLog.Error("Format " + ((int)format) + " is not supported. Uses fallback. Supported ones are: " + string.Join(", ", supported));
+        }
+
+        return ObjectPlainTextFormatter.Format(message, options).ToString();
     }
 }

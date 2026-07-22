@@ -636,9 +636,9 @@ internal static class ObjectPlainTextFormatter
 
         if (obj is StringBuilder sb) return PrintString(sb.ToString());
 
-        if (obj is DateTime dt) return dt.ToString(FormatInstance.DateTimeFormat);
+        if (obj is DateTime dt) return dt.ToString(FormatInstance.IsoDateTimeFormat);
 
-        if (obj is DateTimeOffset dto) return dto.ToString(FormatInstance.DateTimeOffsetFormat);
+        if (obj is DateTimeOffset dto) return dto.ToString(FormatInstance.IsoDateTimeOffsetFormat);
 
         if (obj is Enum enu) return PrintEnum(enu);
 

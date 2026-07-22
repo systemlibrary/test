@@ -79,7 +79,9 @@ internal class FileLogWriter : ILogWriter
 
                 batch.Append(text);
                 batch.AppendLine();
-                batch.AppendLine();
+
+                if(LogInstance.Format != LogFormat.NDJson)
+                    batch.AppendLine();
 
                 max--;
                 if (max < 0)

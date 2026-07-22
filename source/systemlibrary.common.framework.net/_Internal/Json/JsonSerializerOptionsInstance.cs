@@ -25,8 +25,9 @@ static internal class JsonSerializerOptionsFactory
     static JavaScriptEncoder JavaScriptEncoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
 
     static IntJsonConverter IntJsonConverter = new IntJsonConverter();
-    static DateTimeJsonConverter DateTimeJsonConverter = new DateTimeJsonConverter("yyyy-MM-dd HH:mm:ss");
-    static DateTimeOffsetJsonConverter DateTimeOffsetJsonConverter = new DateTimeOffsetJsonConverter("yyyy-MM-dd HH:mm:ss zzz");
+    static DateTimeJsonConverter DateTimeJsonConverter = new DateTimeJsonConverter(FormatInstance.IsoDateTimeFormat);
+    
+    static DateTimeOffsetJsonConverter DateTimeOffsetJsonConverter = new DateTimeOffsetJsonConverter(FormatInstance.IsoDateTimeOffsetFormat);
     static TypeConverter TypeConverter = new TypeConverter();
     static LongJsonConverter LongJsonConverter = new LongJsonConverter();
     static DelegateJsonConverter DelegateJsonConverter = new DelegateJsonConverter();

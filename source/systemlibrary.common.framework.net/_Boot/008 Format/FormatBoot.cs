@@ -1,8 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-using Microsoft.Extensions.Options;
-
-namespace SystemLibrary.Common.Framework.Boostrap;
+﻿namespace SystemLibrary.Common.Framework.Boostrap;
 
 internal static class FormatBoot
 {
@@ -10,20 +6,15 @@ internal static class FormatBoot
 
     static FormatBoot()
     {
+        FormatInstance.IsoDateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fffzzz";
+        FormatInstance.IsoDateTimeOffsetFormat = "yyyy-MM-ddTHH:mm:ss.fffzzz";
+
         if (EnvironmentInstance.IsDev)
         {
-            FormatInstance.DateTimeFormat = "yyyy-MM-dd HH:mm:ss.fff";
-            FormatInstance.DateTimeOffsetFormat = "yyyy-MM-dd HH:mm:ss.fff";
             FormatInstance.ObjectTextFormatterMemberOrder = [
                 nameof(LogMessage.Level),
                 nameof(LogMessage.Timestamp)
             ];
         }
-        else
-        {
-            FormatInstance.DateTimeFormat = "yyyy-MM-dd HH:mm:ss.fffzzz";
-            FormatInstance.DateTimeOffsetFormat = "yyyy-MM-dd HH:mm:ss.fffzzz";
-        }
-
     }
 }

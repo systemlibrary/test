@@ -1,4 +1,7 @@
-﻿using SystemLibrary.Common.Framework.Boostrap;
+﻿using System.Text;
+using System.Text.Json;
+
+using SystemLibrary.Common.Framework.Boostrap;
 using SystemLibrary.Common.Framework.Extensions;
 
 namespace SystemLibrary.Common.Framework;
@@ -17,6 +20,20 @@ internal static class LogFormatter
 
     public static string Format(LogMessage message)
     {
-        return ObjectFormatter.Format(message, FormatOptions);
+        try
+        {
+            return ObjectFormatter.Format(message, FormatOptions);
+        }
+        catch(Exception ex)
+        {
+            if (LogInstance.Format == LogFormat.Text)
+                return message.Level + " " + message.Message + ". Exception thrown during log formatting: " + ex.ToString();
+
+            else if (LogInstance.Format == LogFormat.NDJson)
+                return "{\"Level\":\"" + message.Level + "\",\"Message\":\"" + message.Level + " " + message.Message + ". Exception thrown during log formatting: " + ex.ToString().Replace(Environment.NewLine, "") + "\"}";
+
+            else
+                return "{\n\t\"Level\":\"" + message.Level + "\",\n\t\"Message\":\"" + message.Level + " " + message.Message + ". Exception thrown during log formatting: " + ex.ToString().Replace(Environment.NewLine, "") + "\"\n}";
+        }
     }
 }
