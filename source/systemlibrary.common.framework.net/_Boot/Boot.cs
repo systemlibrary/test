@@ -1,4 +1,4 @@
-﻿namespace SystemLibrary.Common.Framework.Boostrap;
+﻿namespace SystemLibrary.Common.Framework.Bootstrap;
 
 internal partial class Boot
 {
@@ -54,7 +54,7 @@ internal partial class Boot
 
             CryptographyBoot.Strap();
 
-            ServiceProviderBoot.Strap();
+            ServicesBoot.Strap();
 
             JsonBoot.Strap();
 

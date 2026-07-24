@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿using System.Security.Cryptography;
+using System.Text;
 
-using SystemLibrary.Common.Framework.Boostrap;
+using SystemLibrary.Common.Framework.Bootstrap;
 using SystemLibrary.Common.Framework.Extensions;
 
 namespace SystemLibrary.Common.Framework;
@@ -107,11 +108,7 @@ public static partial class Randomness
     /// </summary>
     public static byte[] Bytes(int length = 16)
     {
-        var bytes = new byte[length];
-
-        Random.Shared.NextBytes(bytes);
-
-        return bytes;
+        return RandomNumberGenerator.GetBytes(length);
     }
 
     /// <summary>

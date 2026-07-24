@@ -1,4 +1,4 @@
-﻿namespace SystemLibrary.Common.Framework;
+﻿namespace SystemLibrary.Common.Framework.Bootstrap;
 
 internal class KeyData
 {

@@ -1,4 +1,4 @@
-﻿namespace SystemLibrary.Common.Framework.Boostrap;
+﻿namespace SystemLibrary.Common.Framework.Bootstrap;
 
 internal static class AppRootBoot
 {
@@ -6,14 +6,14 @@ internal static class AppRootBoot
 
     static AppRootBoot()
     {
-        AppRootInstance.AppRootPath = AppRootPath();
+        AppRootInstance.RootPath = RootPath();
 
-        AppRootInstance.ContentRootPath = ContentRootPath();
+        AppRootInstance.WebRootPath = WebRootPath();
 
-        AppRootInstance.AppViewRootPath = AppRootInstance.AppRootPath;
+        AppRootInstance.ViewRootPath = AppRootInstance.RootPath;
     }
 
-    static string AppRootPath()
+    static string RootPath()
     {
         var path = new DirectoryInfo(AppContext.BaseDirectory).FullName;
 
@@ -48,7 +48,8 @@ internal static class AppRootBoot
         return CleanRootPath(tmp);
     }
 
-    static string ContentRootPath()
+    // NOTE: UseContentRoot() is an option in ASPNET, if invoked has to override this one somehow
+    static string WebRootPath()
     {
         try
         {
@@ -62,7 +63,12 @@ internal static class AppRootBoot
             // swallow
         }
 
-        return AppRootInstance.AppRootPath;
+        var wwwroot = Path.Combine(AppRootInstance.RootPath, "wwwroot");
+
+        if (Directory.Exists(wwwroot))
+            return CleanRootPath(wwwroot);
+
+        return AppRootInstance.RootPath;
     }
 
     static bool IsInBin(string dir)

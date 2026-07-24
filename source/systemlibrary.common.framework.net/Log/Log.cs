@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 
 using SystemLibrary.Common.Framework;
-using SystemLibrary.Common.Framework.Boostrap;
+using SystemLibrary.Common.Framework.Bootstrap;
 
 /// <summary>
 /// Static class for writing log entries at various severity levels and clearing the log file.

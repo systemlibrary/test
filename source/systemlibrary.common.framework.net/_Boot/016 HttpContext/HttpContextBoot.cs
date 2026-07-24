@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SystemLibrary.Common.Framework.Boostrap;
+namespace SystemLibrary.Common.Framework.Bootstrap;
 
 static class HttpContextBoot
 {
@@ -9,6 +9,6 @@ static class HttpContextBoot
 
     static HttpContextBoot()
     {
-        HttpContextInstance.HttpContextAccessor = ServiceProviderInstance.Current.GetRequiredService<IHttpContextAccessor>();
+        HttpContextInstance.HttpContextAccessor = ServicesInstance.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
     }
 }

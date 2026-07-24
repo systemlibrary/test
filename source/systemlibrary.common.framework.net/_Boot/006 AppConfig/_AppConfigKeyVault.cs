@@ -5,8 +5,8 @@ using Azure.Security.KeyVault.Secrets;
 
 using Microsoft.Extensions.Configuration;
 
-using SystemLibrary.Common.Framework;
-using SystemLibrary.Common.Framework.Boostrap;
+
+namespace SystemLibrary.Common.Framework.Bootstrap;
 
 internal static class AppConfigKeyVault
 {

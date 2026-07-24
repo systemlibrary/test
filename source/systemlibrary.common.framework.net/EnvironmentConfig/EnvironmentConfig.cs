@@ -1,4 +1,4 @@
-﻿using SystemLibrary.Common.Framework.Boostrap;
+﻿using SystemLibrary.Common.Framework.Bootstrap;
 
 namespace SystemLibrary.Common.Framework;
 
@@ -34,9 +34,14 @@ public class EnvironmentConfig : EnvironmentConfig<EnvironmentConfig, Environmen
     /// </summary>
     public static readonly string ContentRootPath;
 
+    /// <summary>
+    /// Usually the parent of ContentRootPath, where appsettings.json lives
+    /// </summary>
+    public static readonly string AppRootPath;
+
     static EnvironmentConfig()
     {
-        ContentRootPath = AppRootInstance.ContentRootPath;
+        ContentRootPath = AppRootInstance.WebRootPath;
 
         IsTest = Current.EnvironmentType == EnvironmentType.AT ||
             Current.EnvironmentType == EnvironmentType.Integration ||

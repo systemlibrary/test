@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 
-using SystemLibrary.Common.Framework.Boostrap;
+using SystemLibrary.Common.Framework.Bootstrap;
 using SystemLibrary.Common.Framework.Extensions;
 
 namespace SystemLibrary.Common.Framework;
@@ -62,7 +62,7 @@ public class LogMessage
 
             if (level >= LogLevel.Warning)
             {
-                var httpContext = ServiceProviderInstance.Current.GetService<IHttpContextAccessor>()?.HttpContext;
+                var httpContext = ServicesInstance.ServiceProvider.GetService<IHttpContextAccessor>()?.HttpContext;
 
                 CorrelationId = GetCorrelationId(httpContext);
 
@@ -79,7 +79,7 @@ public class LogMessage
             {
                 if (!EnvironmentInstance.IsDev)
                 {
-                    var httpContext = ServiceProviderInstance.Current.GetService<IHttpContextAccessor>()?.HttpContext;
+                    var httpContext = ServicesInstance.ServiceProvider.GetService<IHttpContextAccessor>()?.HttpContext;
 
                     CorrelationId = GetCorrelationId(httpContext);
                 }

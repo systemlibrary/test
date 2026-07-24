@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using SystemLibrary.Common.Framework.Boostrap;
+using SystemLibrary.Common.Framework.Bootstrap;
 
 namespace SystemLibrary.Common.Framework;
 
@@ -10,7 +10,7 @@ internal class LogFlusher
 
     static LogFlusher()
     {
-        Writer = ServiceProviderInstance.Current.GetService<ILogWriter>();
+        Writer = ServicesInstance.ServiceProvider.GetService<ILogWriter>();
         if (Writer == null)
         {
             string message;

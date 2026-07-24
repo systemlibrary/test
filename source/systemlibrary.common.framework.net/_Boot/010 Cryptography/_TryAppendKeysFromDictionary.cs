@@ -1,14 +1,14 @@
 ﻿using SystemLibrary.Common.Framework.Extensions;
 
-namespace SystemLibrary.Common.Framework.Boostrap;
+namespace SystemLibrary.Common.Framework.Bootstrap;
 
 partial class CryptographyBoot
 {
-    static void TryAppendKeysFromDictionary(List<KeyData> keys)
+    static void TryAppendKeysFromDirectories(List<KeyData> keys)
     {
         var directories = new List<string>();
 
-        var keyDirectory = CryptographyInstance.EncryptionKeyDirectory;
+        var keyDirectory = CryptographyInstance.KeyDirectory;
 
         if (keyDirectory.Is())
         {
@@ -33,7 +33,7 @@ partial class CryptographyBoot
 
     static List<string> GetParentDirectories()
     {
-        var path = AppRootInstance.ContentRootPath;
+        var path = AppRootInstance.RootPath;
 
         var start = new DirectoryInfo(path);
 

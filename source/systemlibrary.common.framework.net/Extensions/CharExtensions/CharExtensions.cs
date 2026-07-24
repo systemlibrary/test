@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-using SystemLibrary.Common.Framework.Boostrap;
+using SystemLibrary.Common.Framework.Bootstrap;
 
 namespace SystemLibrary.Common.Framework.Extensions;
 

@@ -1,6 +1,6 @@
 ﻿using System.Reflection.Metadata;
 
-namespace SystemLibrary.Common.Framework.Boostrap;
+namespace SystemLibrary.Common.Framework.Bootstrap;
 
 internal static class FormatInstance
 {

@@ -1,4 +1,4 @@
-﻿namespace SystemLibrary.Common.Framework.Boostrap;
+﻿namespace SystemLibrary.Common.Framework.Bootstrap;
 
 partial class CryptographyBoot
 {
@@ -12,7 +12,7 @@ partial class CryptographyBoot
 
         TryAppendKeyFromKeyVault(list);
 
-        TryAppendKeysFromDictionary(list);
+        TryAppendKeysFromDirectories(list);
 
         TryAppendDefaultKey(list);
 

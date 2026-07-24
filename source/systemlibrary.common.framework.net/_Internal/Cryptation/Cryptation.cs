@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-using SystemLibrary.Common.Framework.Boostrap;
+using SystemLibrary.Common.Framework.Bootstrap;
 
 namespace SystemLibrary.Common.Framework;
 
@@ -10,9 +10,6 @@ internal static partial class Cryptation
     {
         if (key?.Length > 0) return key;
 
-        return CryptographyInstance
-            .Keys
-            .First(x => !x.Source.StartsWith("RSA") && x.Key != null)
-            .Key;
+        return CryptographyInstance.PrimaryKey.Key;
     }
 }

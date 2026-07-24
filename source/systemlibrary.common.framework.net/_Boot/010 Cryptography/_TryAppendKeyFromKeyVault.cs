@@ -1,4 +1,4 @@
-﻿namespace SystemLibrary.Common.Framework.Boostrap;
+﻿namespace SystemLibrary.Common.Framework.Bootstrap;
 
 partial class CryptographyBoot
 {
@@ -7,6 +7,6 @@ partial class CryptographyBoot
         var value = AppConfigKeyVault.Get("slcf-encryption-key");
 
         if (value.Is())
-            keys.Add(KeyData.Create("KEYVAULT", value, null));
+            keys.Add(KeyData.Create("KEYVAULT", value,null));
     }
 }

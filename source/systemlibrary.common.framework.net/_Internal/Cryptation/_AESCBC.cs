@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Security.Cryptography;
 
-using SystemLibrary.Common.Framework.Boostrap;
+using SystemLibrary.Common.Framework.Bootstrap;
 using SystemLibrary.Common.Framework.Extensions;
 
 namespace SystemLibrary.Common.Framework;
@@ -32,43 +32,69 @@ partial class Cryptation
         return memory.ToArray();
     }
 
-    static ConcurrentDictionary<string, byte[]> AesCbcDecryptedShelf = new ConcurrentDictionary<string, byte[]>();
+    static ConcurrentDictionary<string, byte[]> AesCbcDecryptedCache = new ConcurrentDictionary<string, byte[]>();
 
     internal static byte[] DecryptAesCbc(string cipherText64, byte[] key)
     {
         if (cipherText64.IsNot()) return cipherText64.GetBytes();
 
-        string shelfKey = null;
-        if (cipherText64.Length <= 255)
-            shelfKey = cipherText64;
+        string cacheKey = null;
+        if (cipherText64.Length <= 512)
+            cacheKey = cipherText64;
 
-        if (shelfKey != null)
-            if (AesCbcDecryptedShelf.ContainsKey(shelfKey))
-                return AesCbcDecryptedShelf[shelfKey];
+        if (cacheKey != null &&
+            AesCbcDecryptedCache.TryGetValue(cacheKey, out var cached))
+        {
+            return cached.ToArray();
+        }
 
         byte[] bytes = null;
 
-        try
+        if (key != null)
         {
-            bytes = DecryptAesCbc(cipherText64.FromBase64ToBytes(), key);
+            try
+            {
+                bytes = DecryptAesCbc(cipherText64.FromBase64ToBytes(), key);
+            }
+            catch (Exception ex)
+            {
+                var message = GetExceptionMessage(cipherText64, key);
+
+                throw new Exception(message, ex);
+            }
         }
-        catch (Exception ex)
+
+        if (bytes == null)
         {
-            var message = GetExceptionMessage(cipherText64, key);
+            var cipherBytes = cipherText64.FromBase64ToBytes();
+            foreach (var tryKey in CryptographyInstance.DecryptKeys)
+            {
+                try
+                {
+                    bytes = DecryptAesCbc(cipherBytes, tryKey.Key);
+                    break;
+                }
+                catch
+                {
+                    // swallow, continue
+                }
+            }
 
-            throw new Exception(message, ex);
+            if (bytes == null)
+                throw new Exception("Could not decrypt cipher text starting with " + cipherText64.MaxLength(3));
         }
 
-        if (shelfKey != null && AesCbcDecryptedShelf.Count < 64)
-            AesCbcDecryptedShelf.TryAdd(shelfKey, bytes);
+        if (cacheKey != null && AesCbcDecryptedCache.Count < 16)
+        {
+            AesCbcDecryptedCache.TryAdd(cacheKey, bytes);
+        }
+
 
         return bytes;
     }
 
     internal static byte[] DecryptAesCbc(byte[] cipherData, byte[] key)
     {
-        if (cipherData.IsNot()) return cipherData;
-
         // Slice first 16 bytes of data as IV
         var iv = cipherData[..16];
         var data = cipherData[16..];

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace SystemLibrary.Common.Framework.Boostrap;
+namespace SystemLibrary.Common.Framework.Bootstrap;
 
 internal static class AppConfigInstance
 {

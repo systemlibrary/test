@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-using SystemLibrary.Common.Framework.Boostrap;
+using SystemLibrary.Common.Framework.Bootstrap;
 
 namespace SystemLibrary.Common.Framework;
 

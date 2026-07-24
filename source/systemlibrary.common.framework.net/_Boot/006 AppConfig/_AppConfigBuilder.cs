@@ -2,9 +2,7 @@
 
 using Microsoft.Extensions.Configuration;
 
-using SystemLibrary.Common.Framework.Boostrap;
-
-namespace SystemLibrary.Common.Framework;
+namespace SystemLibrary.Common.Framework.Bootstrap;
 
 internal static class AppConfigBuilder
 {
@@ -25,7 +23,7 @@ internal static class AppConfigBuilder
 
         var builder = new ConfigurationBuilder();
 
-        builder.SetBasePath(AppRootInstance.AppRootPath);
+        builder.SetBasePath(AppRootInstance.RootPath);
 
         if(args.Length > 0)
             builder.AddCommandLine(args);

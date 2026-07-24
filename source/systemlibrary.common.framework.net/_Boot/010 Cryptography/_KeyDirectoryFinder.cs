@@ -1,4 +1,4 @@
-﻿namespace SystemLibrary.Common.Framework;
+﻿namespace SystemLibrary.Common.Framework.Bootstrap;
 
 internal static class KeyDirectoryFinder
 {
@@ -11,6 +11,16 @@ internal static class KeyDirectoryFinder
             var files = SearchDirectory(directory);
 
             if (files == null) return null;
+
+            if (CryptographyInstance.KeyDirectory != null &&
+                CryptographyInstance.KeyDirectory != directory)
+            {
+                FrameworkLog.Warning("Multiple key directories exist in the parent, found keys in " + directory + ", but also found in " + CryptographyInstance.KeyDirectory + ". Please have only key files in one parent folder or manually set the directory in appsettings");
+            }
+            else
+            {
+                CryptographyInstance.KeyDirectory = directory;
+            }
 
             var filesSorted = SortKeyFiles(files);
 

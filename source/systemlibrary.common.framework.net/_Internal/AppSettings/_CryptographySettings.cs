@@ -1,5 +1,5 @@
 ﻿
-namespace SystemLibrary.Common.Framework.Boostrap;
+namespace SystemLibrary.Common.Framework.Bootstrap;
 
 internal class CryptographySettings
 {
@@ -9,5 +9,5 @@ internal class CryptographySettings
     /// <para>Or it can be a relative folder within your application that is protected and not served, like app_data for both windows and linux support: ./app_data/</para>
     /// <para>Relative folders must start with ./</para>
     /// </summary>
-    public string EncryptionKeyDirectory { get; set; }
+    public string KeyDirectory { get; set; }
 }

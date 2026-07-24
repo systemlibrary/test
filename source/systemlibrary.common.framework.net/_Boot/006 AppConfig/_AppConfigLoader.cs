@@ -1,10 +1,8 @@
-﻿using System.Diagnostics;
-
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
 using SystemLibrary.Common.Framework.Extensions;
 
-namespace SystemLibrary.Common.Framework.Boostrap;
+namespace SystemLibrary.Common.Framework.Bootstrap;
 
 static class AppConfigLoader
 {

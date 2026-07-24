@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-using SystemLibrary.Common.Framework.Boostrap;
+using SystemLibrary.Common.Framework.Bootstrap;
 using SystemLibrary.Common.Framework.Extensions;
 
 namespace SystemLibrary.Common.Framework;
@@ -17,10 +17,7 @@ internal static partial class Cryptation
     static object[] RSAEncryptLocks;
     static object[] RSADecryptLocks;
 
-    static string DefaultEncryptKeyFileFullPath;
-    static string DefaultDecryptKeyFileFullPath;
-
-    static void TryAddToCache(string keyFileFullPath)
+    static void TryAddToPool(string keyFileFullPath)
     {
         if (keyFileFullPath.IsNot()) return;
 
@@ -79,41 +76,41 @@ internal static partial class Cryptation
 
             RSACachePool = new();
 
-            if (CryptographyInstance.EncryptionKeyDirectory.IsNot())
+            if (CryptographyInstance.KeyDirectory.IsNot())
             {
-                throw new Exception("[Encryption] you have not specified a encryption key directory, nor could we auto detect a parent folder as the key directory. Please set the setting in appsettings: systemLibraryCommonFramework:cryptography:encryptionKeyDirectory");
+                throw new Exception("[Encryption] you have not specified a encryption key directory, nor could we auto detect a parent folder as the key directory. Please set the setting in appsettings: systemLibraryCommonFramework:cryptography:keyDirectory");
             }
 
             RSAEncryptLocks = Enumerable.Range(0, ShardCount).Select(_ => new object()).ToArray();
             RSADecryptLocks = Enumerable.Range(0, ShardCount).Select(_ => new object()).ToArray();
 
-            var dir = CryptographyInstance.EncryptionKeyDirectory;
+            var dir = CryptographyInstance.KeyDirectory;
 
-            var pubFileFullPath = ""; // CryptographyInstance.EncryptionRsaPubFileFullPath;
-            var privFileFullPath = "";// CryptographyInstance.EncryptionRsaPrivFileFullPath;
-
-            // Creating a default pub and priv key files in the specified directory
-            if (pubFileFullPath.IsNot() && privFileFullPath.IsNot())
+            if (CryptographyInstance.RsaKeys.Length == 0)
             {
+                // Creating a default pub and priv key files in the specified directory
                 FrameworkLog.Debug("[Cryptography] auto-generating RSA key files in " + dir);
 
-                Directory.CreateDirectory(dir);
+                if(!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
 
-                pubFileFullPath = Path.Combine(dir, "pem.pub");
-                privFileFullPath = Path.Combine(dir, "pem.priv");
+                var pubFileFullPath = Path.Combine(dir, "pem.pub");
+                var privFileFullPath = Path.Combine(dir, "pem.priv");
 
                 using (var rsa = RSA.Create(4096))
                 {
                     File.WriteAllText(pubFileFullPath, rsa.ExportRSAPublicKeyPem());
                     File.WriteAllText(privFileFullPath, rsa.ExportRSAPrivateKeyPem());
                 }
+
+                CryptographyInstance.RsaKeys = CryptographyInstance.RsaKeys.Add(KeyData.Create("RSA" + Path.GetExtension(privFileFullPath).ToUpper(), null, privFileFullPath));
+                CryptographyInstance.RsaKeys = CryptographyInstance.RsaKeys.Add(KeyData.Create("RSA" + Path.GetExtension(pubFileFullPath).ToUpper(), null, pubFileFullPath));
             }
 
-            TryAddToCache(pubFileFullPath);
-            DefaultEncryptKeyFileFullPath = pubFileFullPath;
-
-            TryAddToCache(privFileFullPath);
-            DefaultDecryptKeyFileFullPath = privFileFullPath;
+            foreach (var rsaKeyFile in CryptographyInstance.RsaKeys)
+            {
+                TryAddToPool(rsaKeyFile.FilePath);
+            }
         }
     }
 
@@ -128,10 +125,10 @@ internal static partial class Cryptation
 
         Initialize();
 
-        TryAddToCache(publicKeyFullPath);
-
         if (publicKeyFullPath.IsNot())
-            publicKeyFullPath = DefaultEncryptKeyFileFullPath;
+            publicKeyFullPath = CryptographyInstance.RsaKeys.First(x => x.Source == "RSAPUB").FilePath;
+
+        TryAddToPool(publicKeyFullPath);
 
         var index = (bytes[0] + bytes.Length) & ShardEnd;
 
@@ -151,10 +148,10 @@ internal static partial class Cryptation
 
         Initialize();
 
-        TryAddToCache(privateKeyFullPath);
-
         if (privateKeyFullPath.IsNot())
-            privateKeyFullPath = DefaultDecryptKeyFileFullPath;
+            privateKeyFullPath = CryptographyInstance.RsaKeys.First(x => x.Source == "RSAPRIV").FilePath;
+
+        TryAddToPool(privateKeyFullPath);
 
         var index = (data[0] + data.Length) & ShardEnd;
 

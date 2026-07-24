@@ -2,7 +2,7 @@
 
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 
-using SystemLibrary.Common.Framework.Boostrap;
+using SystemLibrary.Common.Framework.Bootstrap;
 
 namespace SystemLibrary.Common.Framework;
 

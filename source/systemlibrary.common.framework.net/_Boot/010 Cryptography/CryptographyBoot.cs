@@ -1,4 +1,4 @@
-﻿namespace SystemLibrary.Common.Framework.Boostrap;
+﻿namespace SystemLibrary.Common.Framework.Bootstrap;
 
 internal static partial class CryptographyBoot
 {
@@ -6,8 +6,12 @@ internal static partial class CryptographyBoot
 
     static CryptographyBoot()
     {
-        CryptographyInstance.EncryptionKeyDirectory = FrameworkSettingsInstance.Current.Cryptography.EncryptionKeyDirectory;
+        CryptographyInstance.KeyDirectory = FrameworkSettingsInstance.Current.Cryptography.KeyDirectory;
 
-        CryptographyInstance.Keys = GetKeys();
+        var keys = GetKeys();
+        CryptographyInstance.Keys = keys;
+        CryptographyInstance.PrimaryKey = keys.First(x => !x.Source.StartsWith("RSA"));
+        CryptographyInstance.RsaKeys = keys.Where(x => x.Source.StartsWith("RSA")).ToArray();
+        CryptographyInstance.DecryptKeys = keys.Where(x => !x.Source.StartsWith("RSA")).ToArray();
     }
 }

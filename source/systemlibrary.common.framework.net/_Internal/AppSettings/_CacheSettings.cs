@@ -1,5 +1,5 @@
 ﻿
-namespace SystemLibrary.Common.Framework.Boostrap;
+namespace SystemLibrary.Common.Framework.Bootstrap;
 
 internal class CacheSettings
 {

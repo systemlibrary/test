@@ -22,7 +22,7 @@ partial class FrameworkOptions
     public string[] ViewLocations = null;
 
     /// <summary>
-    /// Generates a single Data Protection key file in the parent of <c>ContentRoot</c>, valid for 100 years.
+    /// Generates a single Data Protection key file in the parent of <c>RootPath</c>, valid for 100 years.
     /// Required for <c>EncryptUsingKeyRing</c> and <c>DecryptUsingKeyRing</c> and cookie encryption across instances. Default: false.
     /// </summary>
     /// <remarks>

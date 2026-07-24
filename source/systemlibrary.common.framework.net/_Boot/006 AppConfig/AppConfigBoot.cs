@@ -1,6 +1,6 @@
 ﻿using SystemLibrary.Common.Framework.Extensions;
 
-namespace SystemLibrary.Common.Framework.Boostrap;
+namespace SystemLibrary.Common.Framework.Bootstrap;
 
 internal static partial class AppConfigBoot
 {
@@ -29,7 +29,7 @@ internal static partial class AppConfigBoot
 
     static string[] FindConfigurationFiles()
     {
-        var rootPath = AppRootInstance.AppRootPath;
+        var rootPath = AppRootInstance.RootPath;
 
         var configsDirPath = Path.Combine(rootPath, "Configs");
         var configurationsDirPath = Path.Combine(rootPath, "Configurations");

@@ -1,6 +1,6 @@
 ﻿using SystemLibrary.Common.Framework.Extensions;
 
-namespace SystemLibrary.Common.Framework.Boostrap;
+namespace SystemLibrary.Common.Framework.Bootstrap;
 
 partial class CryptographyBoot
 {

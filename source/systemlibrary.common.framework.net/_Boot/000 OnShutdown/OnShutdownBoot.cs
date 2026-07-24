@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Loader;
 
-namespace SystemLibrary.Common.Framework;
+namespace SystemLibrary.Common.Framework.Bootstrap;
 
 internal static class OnShutdownBoot
 {
