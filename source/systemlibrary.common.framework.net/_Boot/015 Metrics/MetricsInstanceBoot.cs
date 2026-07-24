@@ -8,8 +8,7 @@ static class MetricsBoot
     {
         var settings = FrameworkSettingsInstance.Current.Metrics;
 
-        MetricsInstance.Enable = settings.Enable;
-        MetricsInstance.secretKeyForUI = settings.SecretKeyForUI;
+        MetricsInstance.Enabled = settings.Enable;
 
         var url = NormalizeUrl(settings.Url);
         MetricsInstance.Url = url;

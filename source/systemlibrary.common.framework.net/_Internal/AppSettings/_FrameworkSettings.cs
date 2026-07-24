@@ -3,12 +3,14 @@
 internal class FrameworkSettings
 {
     public _AppSettings App { get; set; }
+    public AccessSettings Access { get; set; }
     public CryptographySettings Cryptography { get; set; }
     public JsonSettings Json { get; set; }
     public LogSettings Log { get; set; }
     public CacheSettings Cache { get; set; }
     public ClientSettings Client { get; set; }
     public MetricsSettings Metrics { get; set; }
+    public NetworkSettings Network { get; set; }
 
     public FrameworkSettings()
     {

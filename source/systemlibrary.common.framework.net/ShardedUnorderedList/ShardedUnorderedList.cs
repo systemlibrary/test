@@ -4,7 +4,7 @@ namespace SystemLibrary.Common.Framework;
 
 // TODO: marked internal, as not part of v.1 of the framework
 internal class ShardedUnorderedList<TValue> : IEnumerable<TValue>
-{
+{ 
     const int ShardCount = 4;
     const int ShardEnd = 3;
 

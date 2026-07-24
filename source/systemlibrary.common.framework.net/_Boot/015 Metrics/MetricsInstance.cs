@@ -2,8 +2,7 @@
 
 internal static class MetricsInstance
 {
-    internal static bool Enable;
-    internal static string secretKeyForUI;
+    internal static bool Enabled;
     internal static string Url;
     internal static string Path;
     internal static string PathUI;

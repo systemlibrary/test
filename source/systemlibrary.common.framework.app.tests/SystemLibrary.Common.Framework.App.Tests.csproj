@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<IsPackable>false</IsPackable>
+		<IsTestProject>true</IsTestProject>
+		<RootNamespace>SystemLibrary.Common.Framework.App</RootNamespace>
+		<Configurations>Release</Configurations>
+		<RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="ApiTests\**" />
+	  <Compile Remove="AttributesTests\**" />
+	  <Compile Remove="ExtensionsTests\**" />
+	  <EmbeddedResource Remove="ApiTests\**" />
+	  <EmbeddedResource Remove="AttributesTests\**" />
+	  <EmbeddedResource Remove="ExtensionsTests\**" />
+	  <None Remove="ApiTests\**" />
+	  <None Remove="AttributesTests\**" />
+	  <None Remove="ExtensionsTests\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.4.0" />
+		<PackageReference Include="MSTest.TestAdapter" Version="4.2.1" />
+		<PackageReference Include="Microsoft.Testing.Extensions.Telemetry" Version="*" ExcludeAssets="all" />
+		<PackageReference Include="Microsoft.Testing.Extensions.VSTestBridge" Version="*" ExcludeAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="appsettings.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\systemlibrary.common.framework.base.tests\SystemLibrary.Common.Framework.Base.Tests.csproj" />
+	</ItemGroup>
+
+</Project>

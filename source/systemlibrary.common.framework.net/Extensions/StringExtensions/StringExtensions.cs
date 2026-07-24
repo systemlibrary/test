@@ -14,6 +14,29 @@ public static partial class StringExtensions
         EnumMembersCached = new ConcurrentDictionary<int, MemberInfo[]>();
     }
 
+
+    /// <summary>
+    /// Returns the first non-null, non-empty, non-space value from the fallbacks, or empty string.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// string text1 = null;
+    /// var result = text1.OrFirstOf("", " ", "hello"); // "hello"
+    /// </code>
+    /// </example>
+    public static string OrFirstOf(this string text, params string[] fallbacks)
+    {
+        if (text.Is()) return text;
+
+        if (fallbacks == null || fallbacks.Length == 0) return "";
+
+        foreach (var fallback in fallbacks)
+            if (fallback.Is())
+                return fallback;
+
+        return "";
+    }
+
     /// <summary>
     /// Returns true if text ends with any of the values, case-sensitive.
     /// </summary>

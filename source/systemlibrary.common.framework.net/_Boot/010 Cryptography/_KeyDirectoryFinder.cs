@@ -65,7 +65,7 @@ internal static class KeyDirectoryFinder
             else
             {
                 // Adds RSAPUB and RSAPRIV
-                result.Add(KeyData.Create("RSA" + Path.GetExtension(file).ToUpper(), null, file));
+                result.Add(KeyData.Create("RSA" + Path.GetExtension(file).Replace(".", "").ToUpper(), null, file));
             }
         }
         return result;

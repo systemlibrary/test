@@ -1,0 +1,321 @@
+﻿<div id="slcf-metric-charts-container">
+    <div id="slcf-metric-charts">
+    </div>
+</div>
+
+<style>
+    #slcf-metric-charts-container {
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+        padding: 20px;
+    }
+
+    #slcf-metric-charts {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+
+    #slcf-metric-charts .chart-container {
+        flex: 1 1 20%;
+        min-width: 210px;
+        max-width: 210px;
+        margin-bottom: 20px;
+        margin-left: 0;
+    }
+
+    #slcf-metric-charts canvas {
+        padding: 10px;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    #slcf-metric-charts .chart--empty {
+        margin: 0 auto;
+    }
+</style>
+
+<script>
+    window.slcfMetricChartsData = //@data@;
+
+    //console.log(window.slcfMetricChartsData);
+
+    var metricsDefaultTextColor = window.slcfMetricChartsData?.DefaultTextColor;
+    var metricsDefaultShowBorder = window.slcfMetricChartsData?.DefaultShowBorder;
+    var metricsDefaultShowLegend = window.slcfMetricChartsData?.DefaultShowLegend;
+    var metricsDefaultShowAnimation = window.slcfMetricChartsData?.DefaultShowAnimation;
+
+    window.slcfMetricCharts = () => {
+        const easingOptions = ['linear', 'easeInQuad', 'easeOutQuad', 'easeInOutQuad', 'easeInBack']
+
+        const normalize = v => (v === undefined || v === null || v === '') ? '' : v.toString().toLowerCase().replace(/[\s\n\r\t,.\-!?_;:]/g, '')
+
+        function getPieChartOption(label) {
+            let opt = window.slcfMetricChartsData?.Options?.find(opt => opt?.label === label);
+
+            if (!opt) {
+                opt = window.slcfMetricChartsData?.Options?.find(opt => opt?.label === "");
+            }
+
+            if (opt) return opt;
+
+            const base = label.split(':')[0]
+
+            return window.slcfMetricChartsData?.Options?.find(opt => opt?.label === base) || {
+                textColor: metricsDefaultTextColor,
+                showBorder: metricsDefaultShowBorder,
+                showLegend: metricsDefaultShowLegend,
+                showAnimation: metricsDefaultShowAnimation
+            };
+        }
+
+        function getAutoSliceColor(label, segment) {
+            let colorByValue = normalize(segment);
+
+            if (!colorByValue || colorByValue === '0') {
+                colorByValue = normalize(label);
+            }
+
+            /*green: '#4CAF50',       // Status is OK, success
+              lightGreen: '#81C784',  // Status OK after retry, redirects (e.g., 301, 302, 307, 308)
+              red: '#EA4F4F',         // Server Errors (500, 502, 503)
+              lightRed: '#E27373',    // Unauthorized, Access Denied (401, 403, Blocked)
+              orange: '#C47F2E',      // Warning (404 Not Found)
+              lightOrange: '#F2C185', // Gone (410) or mild warning
+              darkRed: '#AF1F2F',     // Critical errors (circuit broken, system down)
+              blue: '#3F6FA9'         // Default (anything else)
+              */
+            const sliceColors = [
+                {
+                    color: '#AF1F2F',
+                    match: ['critical', 'panic', 'explosion', 'explode', 'bomb', 'boom', 'circuit', 'unresponsive', 'offline', 'broken', 'fatal', 'systemdown', 'down', 'overdue', '429', '503']
+                },
+                {
+                    color: '#EA4F4F',
+                    match: ['error', 'exception', 'gateway', 'err', 'fail', 'notvalid', 'crash', 'dead', 'unreachable', 'unavailable', 'outage', 'disconnect', 'corrupt', 'unresponsive', 'notresponsive', 'abort', '500', '502', '503', '504', '505', '507', '509']
+                },
+                {
+                    color: '#E27373',
+                    match: ['bad', 'unauthorized', 'forbidden', 'canceled', 'cancelled', 'timeout', 'invalid', 'notvalid', '401', '403', '405', '407', '413', '415', '431']
+                },
+                {
+                    color: '#81C784',
+                    match: ['retry', 'process', 'handled', 'trace', 'miss', 'resolve', 'fix', 'clean', 'clear', 'available', 'connect', '203', '206']
+                },
+                {
+                    color: '#4CAF50',
+                    match: ['ok', 'okey', 'reachable', 'information', 'pass', 'hit', 'valid', 'success', 'complete', 'finish', 'done', 'active', 'running', 'alive', 'health', 'succeed', 'redirect', '200', '201', '202', '204', '301', '302', '307', '308']
+                },
+                {
+                    color: '#C47F2E',
+                    match: ['warn', 'degraded', 'debug', 'unstable', 'denied', 'deny', 'delayed', 'delaying', 'delayedresponse', 'pending', 'alert', 'highload', 'overload', 'notfound', '400', '402', '404']
+                },
+                {
+                    color: '#F2C185',
+                    match: ['slow', 'not', 'lag', 'queuing', 'waiting', '410', '422', '423', '408']
+                },
+                {
+                    color: '#81C784',
+                    match: ['in']
+                },
+                {
+                    color: '#F2C185',
+                    match: ['out']
+                }
+            ];
+
+            for (let s of sliceColors)
+                if (s.match.some(k => colorByValue.includes(k)))
+                    return s.color
+
+            return '#3F6FA9'
+        }
+
+        function getColor(label, segment) {
+            const m = window.slcfMetricChartsData?.Metrics?.find(x =>
+                normalize(x.Label) === normalize(label) &&
+                normalize(x.Segment) === normalize(segment));
+
+            return m?.Color?.length ? m.Color : getAutoSliceColor(label, segment)
+        }
+
+        function groupMetrics(metrics) {
+            if (!metrics?.length) return []
+
+            metrics.sort((a, b) => {
+                if (a.Count !== b.Count) {
+                    return b.Count - a.Count;
+                }
+                return 0;
+            });
+
+            metrics.sort((a, b) => {
+                if (b.Order !== a.Order) {
+                    return a.Order - b.Order;
+                }
+                return 0;
+            });
+
+            const grouped = {}
+
+            for (const m of metrics) {
+                if (!m) {
+                    continue;
+                }
+                const key = m.Label
+                const segment = m.Segment || null
+                const color = getColor(m.Label, m.Segment)
+
+                if (!grouped[key]) grouped[key] = []
+
+                grouped[key].push({
+                    segment,
+                    count: m.Count,
+                    color
+                })
+            }
+
+            return Object.entries(grouped).map(([label, data]) => ({
+                label,
+                data
+            }))
+        }
+
+        function getTitle(title, maxLen) {
+            return title.length > maxLen ? title.substring(0, (maxLen - 1)) + '...' : title
+        }
+
+        function getSliceLabel(segment, label) {
+
+            if (segment) return segment
+
+            if (label) {
+                if (label.includes(':')) return label.split(':').pop()
+
+                if (label.includes(',')) return label.split(',').pop()
+
+                if (label.includes('/')) return label.split('/').pop()
+
+                return label
+            }
+            return "default";
+        }
+
+        const grouped = groupMetrics(window.slcfMetricChartsData?.Metrics)
+
+        const chartsContainer = document.getElementById('slcf-metric-charts')
+
+        if (grouped?.length) {
+            grouped.forEach((item, index) => {
+                const container = document.createElement('div')
+                container.classList.add('chart-container')
+                container.title = getTitle(item.label, 148)
+
+                const canvas = document.createElement('canvas')
+                container.appendChild(canvas)
+                chartsContainer.appendChild(container)
+
+                const opt = getPieChartOption(item.label)
+
+                const labels = item.data.map(x => getSliceLabel(x.segment, item.label))
+                const slices = item.data.map(x => x.count)
+                const colors = item.data.map(x => x.color)
+
+                const showLegend = slices.length > 1 && opt.showLegend;
+
+                const animationName = easingOptions[Math.floor(Math.random() * easingOptions.length)];
+
+                new Chart(canvas, {
+                    type: 'pie',
+                    data: {
+                        labels,
+                        datasets: [{
+                            data: slices,
+                            borderColor: '#000',
+                            borderWidth: opt.showBorder ? 1 : 0,
+                            backgroundColor: colors
+                        }]
+                    },
+                    plugins: [ChartDataLabels],
+                    options: {
+                        animation: {
+                            duration: opt.showAnimation ? 888 : 0,
+                            easing: opt.showAnimation ? animationName : 'linear'
+                        },
+                        plugins: {
+                            tooltip: {
+                                titleFont: {
+                                    size: 18
+                                },
+                                bodyFont: {
+                                    size: 16
+                                }
+                            },
+                            legend: {
+                                display: showLegend,
+                                position: 'top',
+                                labels: {
+                                    boxWidth: 12,
+                                    padding: 8,
+                                    color: opt.textColor
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: getTitle(item.label, 26),
+                                position: 'top',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                },
+                                color: opt.textColor
+                            },
+                            datalabels: {
+                                color: opt.textColor,
+                                formatter: (_, ctx) => ctx.chart.data.datasets[0].data[ctx.dataIndex],
+                                font: {
+                                    weight: 'bold',
+                                    size: 18
+                                },
+                                anchor: 'center',
+                                align: 'center'
+                            }
+                        }
+                    },
+                    responsive: true
+                })
+            })
+        } else {
+            const msg = document.createElement('p')
+            msg.classList.add('chart--empty')
+            msg.textContent = 'No metrics recorded yet.'
+            chartsContainer.appendChild(msg)
+        }
+    }
+
+    function slcfLoadChartScript(containerId, src) {
+        return new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = src;
+            s.onload = resolve;
+            s.onerror = reject;
+            document.getElementById(containerId)?.appendChild(s);
+        });
+    }
+
+    (async () => {
+        const container = 'slcf-metric-charts-container';
+
+        if (!window.Chart) {
+            await slcfLoadChartScript(container, 'https://cdn.jsdelivr.net/npm/chart.js?v=4.4.8');
+        }
+
+        if (!window.ChartDataLabels) {
+            await slcfLoadChartScript(container, 'https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels?v=2.0.0');
+            // Chart.register(ChartDataLabels);
+        }
+        window.slcfMetricCharts();
+    })();
+</script>

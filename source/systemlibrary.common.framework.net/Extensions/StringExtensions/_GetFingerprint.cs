@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 
 namespace SystemLibrary.Common.Framework;
 
-
 partial class StringExtensions
 {
     const int FingerprintUnrollCount = 5;

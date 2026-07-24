@@ -64,7 +64,7 @@ internal partial class Boot
 
             MetricsBoot.Strap();
 
-            HttpContextBoot.Strap();
+            ContextAccessorBoot.Strap();
 
             FrameworkLog.Flush();
         }

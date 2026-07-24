@@ -45,7 +45,7 @@ partial class StringExtensions
         if (IV != null && IV.Length != 16)
             throw new Exception("IV must be a length of 16 bytes for AES.");
 
-        return Cryptation.EncryptAesCbc(data.GetBytes(encoding), key, IV).ToBase64();
+        return Cryptography.EncryptAesCbc(data.GetBytes(encoding), key, IV).ToBase64();
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ partial class StringExtensions
         if (key != null && key.Length != 16 && key.Length != 24 && key.Length != 32)
             throw new Exception("Key length must be 16, 24, or 32.");
 
-        return Cryptation.DecryptAesCbc(cipherText64, key).ToText(encoding);
+        return Cryptography.DecryptAesCbc(cipherText64, key).ToText(encoding);
     }
     #endregion
 
@@ -110,7 +110,7 @@ partial class StringExtensions
         if (nonce != null && nonce.Length != 12)
             throw new Exception("nonce must be a length of 12 for AES.");
 
-        return Cryptation.EncryptAesGcm(data.GetBytes(encoding), key, nonce).ToBase64();
+        return Cryptography.EncryptAesGcm(data.GetBytes(encoding), key, nonce).ToBase64();
     }
 
     /// <summary>
@@ -135,7 +135,7 @@ partial class StringExtensions
         if (key != null && key.Length != 16 && key.Length != 24 && key.Length != 32)
             throw new Exception("Key length must be 16, 24, or 32 bytes. " + key.Length);
 
-        return Cryptation.DecryptAesGcm(cipherText, key).ToText(encoding);
+        return Cryptography.DecryptAesGcm(cipherText, key).ToText(encoding);
     }
     #endregion
 
@@ -145,7 +145,7 @@ partial class StringExtensions
     /// </summary>
     public static byte[] EncryptRsa(this string data, string publicKeyFullPath = null)
     {
-        return Cryptation.EncryptRsa(data.GetBytes(), publicKeyFullPath);
+        return Cryptography.EncryptRsa(data.GetBytes(), publicKeyFullPath);
     }
 
     /// <summary>
@@ -153,7 +153,7 @@ partial class StringExtensions
     /// </summary>
     public static byte[] DecryptRsa(this string data, string publicKeyFullPath = null)
     {
-        return Cryptation.DecryptRsa(data.GetBytes(), publicKeyFullPath);
+        return Cryptography.DecryptRsa(data.GetBytes(), publicKeyFullPath);
     }
     #endregion
 

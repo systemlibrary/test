@@ -116,7 +116,7 @@ public static class Log
             if (level < LogInstance.MinLogLevel) return;
         }
 
-        if (MetricsInstance.Enable)
+        if (MetricsInstance.Enabled)
             Metric.Inc("Log", level.ToString());
 
         LogQueue.Add(level, message);

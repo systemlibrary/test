@@ -36,7 +36,7 @@ partial class ByteArrayExtensions
         if (IV != null && IV.Length != 16)
             throw new Exception("IV must be a length of 16 bytes for AES.");
 
-        return Cryptation.EncryptAesCbc(data, key, IV);
+        return Cryptography.EncryptAesCbc(data, key, IV);
     }
 
     /// <summary>
@@ -61,7 +61,7 @@ partial class ByteArrayExtensions
         if (key != null && key.Length != 16 && key.Length != 24 && key.Length != 32)
             throw new Exception("Key length must be 16, 24, or 32.");
         
-        return Cryptation.DecryptAesCbc(cipherBytes, key);
+        return Cryptography.DecryptAesCbc(cipherBytes, key);
     }
     #endregion
 
@@ -103,7 +103,7 @@ partial class ByteArrayExtensions
         if (nonce != null && nonce.Length != 12)
             throw new Exception("Nonce must be a length of 12 bytes for AES-GCM.");
         
-        return Cryptation.EncryptAesGcm(data, key, nonce);
+        return Cryptography.EncryptAesGcm(data, key, nonce);
     }
 
     /// <summary>
@@ -128,7 +128,7 @@ partial class ByteArrayExtensions
         if (key != null && key.Length != 16 && key.Length != 24 && key.Length != 32)
             throw new Exception("Key length must be 16, 24, or 32.");
         
-        return Cryptation.DecryptAesGcm(cipherBytes, key);
+        return Cryptography.DecryptAesGcm(cipherBytes, key);
     }
     #endregion
 
@@ -138,7 +138,7 @@ partial class ByteArrayExtensions
     /// </summary>
     public static byte[] EncryptRsa(this byte[] data, string publicKeyFullPath = null)
     {
-        return Cryptation.EncryptRsa(data, publicKeyFullPath);
+        return Cryptography.EncryptRsa(data, publicKeyFullPath);
     }
 
     /// <summary>
@@ -146,7 +146,7 @@ partial class ByteArrayExtensions
     /// </summary>
     public static byte[] DecryptRsa(this byte[] data, string privateKeyFullPath = null)
     {
-        return Cryptation.DecryptRsa(data, privateKeyFullPath);
+        return Cryptography.DecryptRsa(data, privateKeyFullPath);
     }
     #endregion
 }
